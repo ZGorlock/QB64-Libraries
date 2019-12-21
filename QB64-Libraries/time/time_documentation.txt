@@ -1,0 +1,557 @@
+=================DOCUMENTATION FOR GORLOCK'S QB64 TIME LIBRARY==================
+
+
+This library contains functions and subroutines aimed at providing the programmer with easy use of date and time calculations and display. Below the entire functionality and use of this library and its functions and subroutines will be explained.
+
+Firstly, this library requires Gorlock's QB64 Common Library, if you do not already have this library included you can download it here: https://db.tt/k9Tb6QJ4. Make sure that you include common_init BEFORE time_init in your code, at the very beginning if possible. It includes initiations, constant declarations, shared variables, etc. that allow this library, as well as any of my other libraries, to work. Failure to follow the instructions provided could result in IDE errors your the code or unexpected results in compiled code.
+This library has code that must be manually copied into your code body. This code can be found in the time_include file found here: https://db.tt/dj3KMIgg.
+Include this library into your code as shown in the time_template file found here: https://db.tt/BetY0d0c. Note that if you have additional libraries that use the input library, use their template instead. If you have any additional libraries, you will have to logically combine their templates.
+Note that if you have any other declared library functions or subroutines, you MUST combine them! If you have multiple declarations of the same library, even with different functions, you will have a C++ compiler error.
+
+
+================================================================================
+
+
+This library defines several useful constants that you can use in your code.
+
+
+CONSTANT                               VALUE
+
+SUNDAY                                 0
+MONDAY                                 1
+TUESDAY                                2
+WEDNESDAY                              3
+THURSDAY                               4
+FRIDAY                                 5
+SATURDAY                               6
+
+JANUARY                                1
+FEBRUARY                               2
+MARCH                                  3
+APRIL                                  4
+MAY                                    5
+JUNE                                   6
+JULY                                   7
+AUGUST                                 8
+SEPTEMBER                              9
+OCTOBER                                10
+NOVEMBER                               11
+DECEMBER                               12
+
+DaysInJanuary                          31
+DaysInFebruary                         28
+DaysInMarch                            31
+DaysInApril                            30
+DaysInMay                              31
+DaysInJune                             30
+DaysInJuly                             31
+DaysInAugust                           31
+DaysInSeptember                        30
+DaysInOctober                          31
+DaysInNovember                         30
+DaysInDecember                         31
+
+MillisecondsInSecond                   1000
+MillisecondsInMinute                   60000
+MillisecondsInHour                     3600000
+MillisecondsInDay                      86400000
+MillisecondsInYear                     31556952000
+SecondsInMinute                        60
+SecondsInHour                          3600
+SecondsInDay                           86400
+SecondsInYear                          31556952
+MinutesInHour                          60
+MinutesInDay                           1440
+MinutesInYear                          525949.2
+HoursInDay                             24
+HoursInYear                            8765.82
+DaysInWeek                             7
+DaysInMonth                            30
+DaysInYear                             365.2425
+YearsInDecade                          10
+YearsInCentury                         100
+YearsInMillenium                       1000
+
+KinInWinal                             20
+KinInTun                               360
+KinInKatun                             7200
+KinInBaktun                            144000
+WinalInTun                             18
+WinalInKatun                           360
+WinalInBaktun                          7200
+TunInKatun                             20
+TunInBaktun                            360
+KatunInBaktun                          20
+
+MIDNIGHT                               0
+MORNING                                18000
+NOON                                   43200
+AFTERNTOON                             43200
+EVENING                                61200
+NIGHT                                  75600
+
+ASTROLOGICALAGE_LENGTH                 2160
+JULIANDAY_LONGCOUNT_OFFSET             584283
+JULIANDAY_LUNAR_LONGITUDE_OFFSET       2451555.8
+JULIANDAY_LUNAR_OFFSET                 2451562.2
+JULIANDAY_LUNAR_SYNODIC_OFFSET         2451550.1
+LUNAR_ANOMALISTIC_CYCLE_LENGTH         27.55454988
+LUNAR_CYCLE_LENGTH                     29.530588853
+LUNAR_ECLIPTIC_LATITUDE_CYCLE_LENGTH   27.212220817
+LUNAR_ECLIPTIC_LONGITUDE_CYCLE_LENGTH  27.321582241
+PLATONICAGE_LENGTH                     26920
+t19700101                              116444735972888098&&
+
+
+--------------------------------------------------------------------------------
+
+
+This is a fairly basic library to understand. There are two groups of functions and subroutines: a group that deals with only the current date and time which acts as constants, and a group that preforms the same function on a filetime that may or may not be the current time. It was designed this way so that you could use the commands like constants that are always updating without needing any parameters, but you can also do calculations and displays of other times.
+
+Let's first experiment with the first group, try the example below:
+
+
++------------------------------------------------------------------------------+
+|DO                                                                            |
+|    _LIMIT 16                                                                 |
+|    CLS                                                                       |
+|    PRINT YEAR                                                                |
+|    PRINT MONTH                                                               |
+|    PRINT DAY                                                                 |
+|    PRINT HOUR                                                                |
+|    PRINT MINUTE                                                              |
+|    PRINT SECOND                                                              |
+|    PRINT MILLISECOND                                                         |
+|LOOP UNTIL INKEY$ > ""                                                        |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+This shows several aspects the current date and time. Lets try to use the second group now, to create a SYSTEMTIME structure, you can use the sub MAKETIME. You first must define a SYSTEMTIME structure, then the parameters for the sub are the SYSTEMTIME structure, the year of your date, the month of your date, the day of your date, the hour of your time, the minute of your time, the second of your time, and the millidecond of your time. This will store your desired date and time in the SYSTEMTIME specified. Lets try creating one:
+
+
++------------------------------------------------------------------------------+
+|DIM a AS SYSTEMTIME                                                           |
+|MAKETIME a, 1985, 10, 3, 12, 52, 20, 0                                        |
++------------------------------------------------------------------------------+
+
+
+The second group uses the same function names as the first group except it is followed by a _X; YEAR becomes YEAR_X. The second group of functions also has a parameter, the SYSTEMTIME. Lets try updating the first example to use our desired time:
+
+
++------------------------------------------------------------------------------+
+|DIM a AS SYSTEMTIME                                                           |
+|MAKETIME a, 1985, 10, 3, 12, 52, 20, 0                                        |
+|PRINT YEAR_X(a)                                                               |
+|PRINT MONTH_X(a)                                                              |
+|PRINT DAY_X(a)                                                                |
+|PRINT HOUR_X(a)                                                               |
+|PRINT MINUTE_X(a)                                                             |
+|PRINT SECOND_X(a)                                                             |
+|PRINT MILLISECOND_X(a)                                                        |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+We can also use CURRENTTIME to designate the current time to a SYSTEMTIME.
+
+
++------------------------------------------------------------------------------+
+|DIM a AS SYSTEMTIME                                                           |
+|DO                                                                            |
+|    _LIMIT 16                                                                 |
+|    CURRENTTIME a                                                             |
+|    CLS                                                                       |
+|    PRINT YEAR_X(a)                                                           |
+|    PRINT MONTH_X(a)                                                          |
+|    PRINT DAY_X(a)                                                            |
+|    PRINT HOUR_X(a)                                                           |
+|    PRINT MINUTE_X(a)                                                         |
+|    PRINT SECOND_X(a)                                                         |
+|    PRINT MILLISECOND_X(a)                                                    |
+|LOOP UNTIL INKEY$ > ""                                                        |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+Notice that we get the same output as the first example.
+
+
+There are several different ways to obtain each value, just choose the one that most fits your needs. I will list and describe the output of each function as best I can while being breif. For a deeper understanding of the functions test them out i your code. I will try to divide the functions into categories so that they are easier to see.
+
+
+--------------------------------------------------------------------------------
+
+
+                                  DATE AND TIME
+
+
+YEAR             -  Returns the value of the year
+YEAR_SHORT       -  Returns the 2-digit value of the year
+MONTH            -  Returns the value of the month
+DAY              -  Returns the value of the day
+DAYOFWEEK        -  Returns the count of days since the last Sunday
+WEEK             -  Returns the week number of the year
+HOUR             -  Returns the value of the hour
+HOUR_12          -  Returns the 12-hour version of the value of the hour
+MINUTE           -  Returns the value of the minute
+SECOND           -  Returns the value of the second
+MILLISECOND      -  Returns the value of the millisecond
+
+MONTHNAME        -  Returns the month name as a string
+DAYNAME          -  Returns the day name as a string
+HOLIDAY          -  Returns the holidays that are today, if any
+TIMENAME         -  Returns the name group of the time
+
+WEEKDAYINMONTH   -  Returns the number of days in the month so far that have the
+                    same name
+YEAR_CYCLE       -  Returns the number of days since the beginning of the year
+
+MONTH_DAYS       -  Returns the number of days in a month. This function has one
+                    parameter, the month number 1 to 12 or month constant.
+LEAPYEAR         -  Returns TRUE if the year is a leapyear
+
+TIMEZONE         -  Returns the name of the timezone
+TIMEZONE_DST     -  Returns whether it is daylight savings time or not
+TIMEZONE_OFFSET  -  Returns the offset of the timezone from UTC in hours
+
+
+                                STRING FUNCTIONS
+FUNCTION                                                                    FORM
+
+DATE                                                                  MM-DD-YYYY
+DATE_SHORT                                                              MM-DD-YY
+TIME                                                                    HH:MM:SS
+TIME_SHORT                                                                 HH:MM
+TIME_LONG                                                            HH:MM:SS:FF
+TIME_12                                                                 HH:MM:SS
+TIME_12_SHORT                                                              HH:MM
+TIME_12_LONG                                                         HH:MM:SS:FF
+MILLISECOND_STR                                                               FF
+DATETIME                                                     MM-DD-YYYY HH:MM:SS
+DATETIME_SHORT                                                  MM-DD-YYYY HH:MM
+DATETIME_SHORT_12                                               MM-DD-YYYY HH:MM
+DATETIME_SHORT_12_SHORTYEAR                                       MM-DD-YY HH:MM
+DATETIME_SHORT_SHORTYEAR                                          MM-DD-YY HH:MM
+DATETIME_SHORTYEAR                                             MM-DD-YY HH:MM:SS
+DATETIME_LONG                                             MM-DD-YYYY HH:MM:SS:FF
+DATETIME_LONG_12                                          MM-DD-YYYY HH:MM:SS:FF
+DATETIME_LONG_12_SHORTYEAR                                  MM-DD-YY HH:MM:SS:FF
+DATETIME_LONG_SHORTYEAR                                     MM-DD-YY HH:MM:SS:FF
+DATETIME_12                                                  MM-DD-YYYY HH:MM:SS
+DATETIME_12_SHORTYEAR                                          MM-DD-YY HH:MM:SS
+TIMESTAMP                                                         YYYYMMDDHHMMSS
+TIMESTAMP_SHORT                                                     YYYYMMDDHHMM
+TIMESTAMP_SHORT_SHORTYEAR                                             YYMMDDHHMM
+TIMESTAMP_SHORTYEAR                                                 YYMMDDHHMMSS
+TIMESTAMP_LONG                                                  YYYYMMDDHHMMSSFF
+TIMESTAMP_LONG_SHORTYEAR                                        YYYYMMDDHHMMSSFF
+
+Y = Year   M = Month, Minute   D = Day   H = Hour   S = Second   F = Millisecond
+
+
+--------------------------------------------------------------------------------
+
+
+                                COMPARING TIMES
+
+
+You can also compare SYSTEMTIMEs. To do this we can use the function TIMECOMPARE. This function takes 2 SYSTEMTIME structures as parameters and compares them. This function will return one of the three following values:
+  -1  -  The first SYSTEMTIME is before the second one
+   0  -  The first SYSTEMTIME is equal to the second one
+   1  -  The first SYSTEMTIME is after the second one
+
+TIMEISAFTER, TIMEISBEFORE, or TIMEISEQUAL could be used instead to test and return a boolean. All these functions have the same parameters as TIMECOMPARE. When trying to figure out which SYSTEMTIME to put first think about TIMEISAFTER(a, b) as "TIME a IS AFTER b?".
+
+
++------------------------------------------------------------------------------+
+|DIM a AS SYSTEMTIME                                                           |
+|DIM b AS SYSTEMTIME                                                           |
+|MAKETIME a, 1985, 10, 3, 12, 52, 20, 0                                        |
+|MAKETIME b, 2004, 5, 1, 17, 30, 48, 0                                         |
+|PRINT TIMECOMPARE(a, b)                                                       |
+|PRINT TIMEISAFTER(a, b)                                                       |
+|PRINT TIMEISBEFORE(a, b)                                                      |
+|PRINT TIMEISEQUAL(a, b)                                                       |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+TIMEAFTER is both a subroutine and a function. The subroutine TIMEAFTER has the parameters (t1 AS SYSTEMTIME, t2 AS SYSTEMTIME, y%, m%%, d%%, h%%, n%%, s%%). It will take the time stored in t1 and add y% years, m%% months, d%% days, h%% hours, n%% minutes, and s%% seconds. The resulting time is stored in t2. The function TIMEAFTER has similar parameters but only one SYSTEMTIME, t. The specified years, months, etc. are added to t and the function returns the 64bit FILETIME value of the new time.
+TIMEBEFORE is also both a subroutine and a function. It works identical to TIMEAFTER except that it is subtracting the specified values rather than adding them.
+
+The TIMEBETWEEN subroutine takes three SYSTEMTIME parameters and saves the time between the first and second one in the third one. This resulting SYSTEMTIME isn't correctly oriented for calculations but you can call TIMEWEEN_STR(t3) on it to get a text string representing the time between the first and second SYSTEMTIME. You can also use TIMEBETWEEN_STR_LONG if you need millisecond accuracy.
+The TIMEBETWEEN function takes two SYSTEMTIME parameters and returns their 64bit FILETIME difference. If you wish to recieve this difference in a particular form you can use TIMEBETWEEN_YEAR, TIMEBETWEEN_MONTH, TIMEBETWEEN_WEEK, TIMEBETWEEN_DAY, TIMEBETWEEN_HOUR, TIMEBETWEEN_MINUTE, TIMEBETWEEN_SECOND, or TIMEBETWEEN_MILLISECOND. All of these functions have the same parameters as TIMEBETWEEN.
+
+
++------------------------------------------------------------------------------+
+|DIM a AS SYSTEMTIME                                                           |
+|DIM b AS SYSTEMTIME                                                           |
+|DIM c AS SYSTEMTIME                                                           |
+|MAKETIME a, 1985, 10, 3, 12, 52, 20, 0                                        |
+|MAKETIME b, 2004, 5, 1, 17, 30, 48, 0                                         |
+|PRINT TIMEBETWEEN(a, b)                                                       |
+|PRINT                                                                         |
+|TIMEBETWEEN a, b, c                                                           |
+|PRINT TIMEBETWEEN_STR_LONG(c)                                                 |
+|PRINT                                                                         |
+|PRINT TIMEBETWEEN_YEAR(a, b)                                                  |
+|PRINT TIMEBETWEEN_MONTH(a, b)                                                 |
+|PRINT TIMEBETWEEN_WEEK(a, b)                                                  |
+|PRINT TIMEBETWEEN_DAY(a, b)                                                   |
+|PRINT TIMEBETWEEN_HOUR(a, b)                                                  |
+|PRINT TIMEBETWEEN_MINUTE(a, b)                                                |
+|PRINT TIMEBETWEEN_SECOND(a, b)                                                |
+|PRINT TIMEBETWEEN_MILLISECOND(a, b)                                           |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+The following subroutines are used by the library, but you may find use for them in your code. CLEARDATE empties the date elements, year, month, and day, from the specified SYSTEMTIME leaving only the time elements. CLEARTIME empties the time elements, hour, minute, and second, to midnight of the SYSTEMTIME specified, leaving only the date elements.
+REPAIRTIME heals a SYSTEMTIME, if you add 10 hours to your SYSTEMTIME and end up with an hour value of 33, it will not work in calculations. REPAIRTIME accomodates for this and returns the SYSTEMTIME to a healthy state.
+
+
++------------------------------------------------------------------------------+
+|DIM a AS SYSTEMTIME                                                           |
+|MAKETIME a, 1988, 3, 12, 33, 21, 40, 0                                        |
+|PRINT DAY_X(a)                                                                |
+|PRINT HOUR_X(a)                                                               |
+|PRINT                                                                         |
+|REPAIRTIME a                                                                  |
+|PRINT DAY_X(a)                                                                |
+|PRINT HOUR_X(a)                                                               |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+--------------------------------------------------------------------------------
+
+
+                               ALTERNATIVE TIMES
+
+
+UNIXTIME        -  Returns the number of seconds since 01-01-1970
+UNIXTIME_LONG   -  Returns the number of 10 microseconds since 01-01-1970
+
+JULIANDAY       -  Returns the Julian date
+JULIANDAY_LONG  -  Returns the Julian date including partial date
+
+TICKCOUNT       -  Returns the number of milliseconds that have elapsed since
+                   the system was last started, up to 49.7 days
+
+
+UNIXTIME or UNIXTIME_LONG can be used for timestamping files.
+JULIANDAY or JULIANDAY_LONG can be used for calculations of heavenly body positions, particularly lunar calculations.
+TICKCOUNT is specific to your machine and resets every time you reboot.
+
+
++------------------------------------------------------------------------------+
+|DO                                                                            |
+|    _LIMIT 16                                                                 |
+|    CLS                                                                       |
+|    PRINT UNIXTIME                                                            |
+|    PRINT UNIXTIME_LONG                                                       |
+|    PRINT                                                                     |
+|    PRINT JULIANDAY                                                           |
+|    PRINT JULIANDAY_LONG                                                      |
+|    PRINT                                                                     |
+|    PRINT TICKCOUNT                                                           |
+|LOOP UNTIL INKEY$ > ""                                                        |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+--------------------------------------------------------------------------------
+
+
+                               LUNAR CALCULATIONS
+
+
+LUNAR_AGE                 -  Returns the age of the moon
+LUNAR_AGE_LONG            -  Returns the age of the moon including partial days
+LUNAR_ANOMALISTIC         -  Retuns the anomolistic phase of the moon
+LUNAR_ANOMALISTIC_LONG    -  Retuns the anomolistic phase of the moon including
+                             partial days
+LUNAR_DISTANCE            -  Returns the distance of the moon in Earth radii
+LUNAR_DRAW                -  Returns the handle of an image whereupon the moon
+                             in its current phase is drawn
+LUNAR_ECLIPTIC_LATITUDE   -  Returns the current ecliptic latitude of the moon
+LUNAR_ECLIPTIC_LONGITUDE  -  Returns the current ecliptic longitude of the moon
+LUNAR_PHASE               -  Returns the current phase of the moon expressed as
+                             a string
+LUNAR_SYNODIC             -  Returns the synodic phase of the moon
+LUNAR_SYNODIC_RAD         -  Returns the synodic phase of the moon in radians
+
+These commands are pretty self-explanatory, LUNAR_DRAW has one parameter, r, the radius of the moon being drawn. The size of the image created is 2r pixels by 2r pixels.
+
+
++------------------------------------------------------------------------------+
+|DIM a AS LONG                                                                 |
+|a = LUNAR_DRAW(100)                                                           |
+|_PUTIMAGE (220, 140), a                                                       |
+|PRINT "Day"; LUNAR_AGE                                                        |
+|PRINT LUNAR_PHASE                                                             |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+There are 4 subroutines for finding special lunar dates, all of these take a single parameter, a SYSTEMTIME t, to store the date in.
+
+LUNAR_LAST_FULL  -  Saves the date of the last full moon
+LUNAR_LAST_NEW   -  Saves the date of the last new moon
+LUNAR_NEXT_FULL  -  Saves the date of the next full moon
+LUNAR_NEXT_NEW   -  Saves the date of the next new moon
+
+
++------------------------------------------------------------------------------+
+|DIM t AS SYSTEMTIME                                                           |
+|LUNAR_LAST_FULL t                                                             |
+|PRINT DATE_X(t)                                                               |
+|LUNAR_LAST_NEW t                                                              |
+|PRINT DATE_X(t)                                                               |
+|LUNAR_NEXT_FULL t                                                             |
+|PRINT DATE_X(t)                                                               |
+|LUNAR_NEXT_NEW t                                                              |
+|PRINT DATE_X(t)                                                               |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+--------------------------------------------------------------------------------
+
+
+                           ASTROLOGICAL CALCULATIONS
+
+
+ZODIAC                 -  Returns the zodiac symbol for this time
+BIRTHSTONE             -  Returns the birthstone for this month
+
+ASTROLOGICALAGE        -  Returns the name of the current astrological age
+ASTROLOGICALAGE_CYCLE  -  Returns the number of years since the start of the
+                          current astrological age
+ASTROLOGICALAGE_END    -  Returns the year that marks the end of the current
+                          astrological age
+ASTROLOGICALAGE_LEFT   -  Returns the number of years remaining in the current
+                          astrological age
+ASTROLOGICALAGE_START  -  Returns the year that marked the start of the current
+                          astrological age
+
+PLATONICYEAR_CYCLE     -  Returns the number of years since the start of the
+                          current Platonic year
+PLATONICYEAR_END       -  Returns the year that marks the end of the current
+                          Platonic year
+PLATONICYEAR_LEFT      -  Returns the number of years remaining before the end
+                          of the current Platonic year
+PLATONICYEAR_START     -  Returns the year that marked the beginning of the
+                          current Platonic year
+
+
++------------------------------------------------------------------------------+
+|PRINT ZODIAC                                                                  |
+|PRINT BIRTHSTONE                                                              |
+|PRINT                                                                         |
+|PRINT ASTROLOGICALAGE                                                         |
+|PRINT ASTROLOGICALAGE_START                                                   |
+|PRINT ASTROLOGICALAGE_END                                                     |
+|PRINT ASTROLOGICALAGE_CYCLE                                                   |
+|PRINT ASTROLOGICALAGE_LEFT                                                    |
+|PRINT                                                                         |
+|PRINT PLATONICYEAR_START                                                      |
+|PRINT PLATONICYEAR_END                                                        |
+|PRINT PLATONICYEAR_CYCLE                                                      |
+|PRINT PLATONICYEAR_LEFT                                                       |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+--------------------------------------------------------------------------------
+
+
+                                MAYAN LONG COUNT
+
+
+
+LONGCOUNT                  -  Returns the Mayan Long Count expressed as a string
+
+LONGCOUNT_DAYS             -  Returns the number of days since the last 13th
+                              Bak'tun
+LONGCOUNT_DAYS_LONG        -  Returns the number of days since the last 13th
+                              Bak'tun including partial days
+
+LONGCOUNT_KIN              -  Returns the K'in value of the Long Count
+LONGCOUNT_WINAL            -  Returns the Winal value of the Long Count
+LONGCOUNT_TUN              -  Returns the Tun value of the Long Count
+LONGCOUNT_KATUN            -  Returns the K'atun value of the Long Count
+LONGCOUNT_BAKTUN           -  Returns the B'ak'tun value of the Long Count
+
+LONGCOUNT_TZOLKIN          -  Returns the Mayan Tzolk'in expressed as a string
+LONGCOUNT_TZOLKIN_DATE     -  Returns the day value of the Tzolk'in week
+LONGCOUNT_TZOLKIN_DAY      -  Returns the Tzolk'in week name
+LONGCOUNT_TZOLKIN_DAY_NUM  -  Returns the Tzolk'in week value
+
+LONGCOUNT_HAAB             -  Returns the Mayan Haab' expressed as a string
+LONGCOUNT_HAAB_DATE        -  Returns the day value of the Haab' month
+LONGCOUNT_HAAB_DAY         -  Returns the day value of the Haab' cycle
+LONGCOUNT_HAAB_MONTH       -  Returns the Haab' month name
+LONGCOUNT_HAAB_MONTH_NUM   -  Returns the Haab' month value
+
+LONGCOUNT_CALENDARROUND    -  Returns the Mayan Calendar Round expressed as a
+                              string
+
+LONGCOUNT_LONG             -  Returns the Long Count including the Tzolk'in and
+                              Haab' dates expressed as a string
+
+
+These are also pretty self explanatory, if you want to learn more about the Mayan Long Count, check out the Wikipedia page: http://en.wikipedia.org/wiki/Mesoamerican_Long_Count_calendar
+
+
++------------------------------------------------------------------------------+
+|PRINT LONGCOUNT                                                               |
+|PRINT LONGCOUNT_DAYS                                                          |
+|PRINT                                                                         |
+|PRINT LONGCOUNT_KIN                                                           |
+|PRINT LONGCOUNT_WINAL                                                         |
+|PRINT LONGCOUNT_TUN                                                           |
+|PRINT LONGCOUNT_KATUN                                                         |
+|PRINT LONGCOUNT_BAKTUN                                                        |
+|PRINT                                                                         |
+|PRINT LONGCOUNT_TZOLKIN                                                       |
+|PRINT LONGCOUNT_HAAB                                                          |
+|PRINT LONGCOUNT_CALENDARROUND                                                 |
+|PRINT                                                                         |
+|PRINT LONGCOUNT_LONG                                                          |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+Don't forget you can use the second group to do calculations on a time other than the current time. Lets see what the Mayan Long Count was on December 21, 2012.
+
+
++------------------------------------------------------------------------------+
+|DIM a AS SYSTEMTIME                                                           |
+|MAKETIME a, 2012, 12, 21, 0, 0, 0, 0                                          |
+|PRINT LONGCOUNT_X(a)                                                          |
+|PRINT LONGCOUNT_DAYS_X(a)                                                     |
+|PRINT                                                                         |
+|PRINT LONGCOUNT_KIN_X(a)                                                      |
+|PRINT LONGCOUNT_WINAL_X(a)                                                    |
+|PRINT LONGCOUNT_TUN_X(a)                                                      |
+|PRINT LONGCOUNT_KATUN_X(a)                                                    |
+|PRINT LONGCOUNT_BAKTUN_X(a)                                                   |
+|PRINT                                                                         |
+|PRINT LONGCOUNT_TZOLKIN_X(a)                                                  |
+|PRINT LONGCOUNT_HAAB_X(a)                                                     |
+|PRINT LONGCOUNT_CALENDARROUND_X(a)                                            |
+|PRINT                                                                         |
+|PRINT LONGCOUNT_LONG_X(a)                                                     |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+--------------------------------------------------------------------------------
+
+
+I hope you enjoy this library! If you discover an error, think of an idea for a future update, or have a question about the library, please email me at ZGorlock@gmail.com.
+
+
+================================================================================

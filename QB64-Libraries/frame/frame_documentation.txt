@@ -1,0 +1,163 @@
+=================DOCUMENTATION FOR GORLOCK'S QB64 FRAME LIBRARY=================
+
+
+This library contains subroutines that allow the programmer to generate frames and borders. Below the entire functionality and use of this library and its subroutines will be explained.
+
+Include this library into your code as shown in the frame_template file found here: https://db.tt/80JtLWPe. If you have any additional libraries, you will have to logically combine their templates.
+
+
+================================================================================
+
+
+This library defines several useful constants that you can use in your code.
+
+There are 8 constants you can use for the 8 themes of frames:
++---------------------------------------+
+|=VALUE=|=======CONST=======|===THEME===|
++-------+-------------------+-----------|
+|   1   |  FRAME_SILVER     | Silver    |
+|   2   |  FRAME_GOLD       | Gold      |
+|   3   |  FRAME_BRONZE     | Bronze    |
+|   4   |  FRAME_COPPER     | Copper    |
+|   5   |  FRAME_LAVA       | Lava      |
+|   6   |  FRAME_WOOD       | Wood      |
+|   7   |  FRAME_MAHOGANY   | Mahogany  |
+|   8   |  FRAME_RUST       | Rust      |
++---------------------------------------+
+
+You can use FRAME_SINGLE to indicate a single width frame, and FRAME_DOUBLE to indicate a double width frame.
+The value of FRAME_BORDER is set at 2 because in the imag resources, there is a 2 pixel wide border surrounding the frames to allow for alpha fading.
+
+There is a shared string, Frameloc, declared. You should set this to the location of the frame resource folder extracted from frame_resource. If you have not already download this, you can download it here: https://db.tt/t7hs0Qli, it is necessary for the library to work. By setting Frameloc to the absolute or relative directory location of this resource folder, you can leave the floc$ parameter blank when calling LOADFRAME; if it is blank, it automatically uses the location stored in Frameloc.
+
+This program defines an array, frameimg(), that is used to store the image handles of a frame loaded with LOADFRAME.
+
+
+--------------------------------------------------------------------------------
+
+
+I will now provide a logical tutorial for this library.
+I would recommend typing out the examples by hand so that you get a feel for the commands, but you can just copy and paste if you choose. If you copy and paste you will have to delete the first and last character of each line.
+Make sure that you are using frame_template as your template; the examples are just the code that goes in the middle.
+
+First you have to load a frame into your frameimg() array.
+The LOADFRAME subroutine has 2 parameters: the theme and the frame resource location. The theme can be any of the theme constants listed above. The frame resource location string should indicate the absolute or relative location of the frame resource folder. This string should not be terminated with a slash. Remember, if you set Frameloc to your location, you can use that as the parameter or simply ""; it will automatically use the location in Frameloc if the parameter string is blank.
+
+
++------------------------------------------------------------------------------+
+|Frameloc = "frame"                                                            |
+|LOADFRAME FRAME_GOLD, Frameloc                                                |
++------------------------------------------------------------------------------+
+
+
+Now you have loaded the image resources for the Gold theme frame into frameimg(). You don't have to worry about this, the library takes care of everything behind the scenes. All you have to do is learn the syntax and commands for the instruction string parameter of the FRAME subroutine.
+
+The FRAME subroutine has 3 parameters: the instruction string, the width of the frame, and the image handle of the destination image to draw the frame on.
+
+The syntax for the instruction string is very similar to the syntax for the DRAW command. Just imagine you are drawing with an invisible cursor and putting nodes at relative positions. You DO NOT have to do anything for the sides, as long as the nodes line up, it will automatically create the sides. This will make more sense as you go through the instructions and see examples.
+Every command in the instruction string must be separated by a space and must have no internal spaces. You must start the command string with an initial x and y coordinate. Then you can use:
+U to move the invisible cursor up
+D to move it down
+L to move it left
+R to move it right
+P to set an x coordinate of the cursor that isnt relative to the current
+  location
+Q to set an y coordinate of the cursor that isnt relative to the current
+  location
+C this draws a corner at the current cursor location
+   1 - upper right corner
+   2 - upper left corner
+   3 - bottom left corner
+   4 - bottom right corner
+N to draw a cap (terminates a side and isnt a corner)
+   1 - terminates on the right of a horizontal side
+   2 - terminates on the top of a vertical side
+   3 - terminates on the left of a horizontal side
+   4 - terminates on the bottom of a vertical side
+T to draw a T (3 sockets)
+   1 - off a left wall
+   2 - off a top wall
+   3 - off a right wall
+   4 - off a bottom wall
+X to draw a cross
+   1 - a cross, yes you have to type 1
+
+The width parameter can be either FRAME_SINGLE for a single width frame, or FRAME_DOUBLE for a double width frame.
+The destination image parameter can be any handle you want it to be allowing you to draw frames on images that aren't necessarily the screen image. However, to draw on the screen use a value of 0.
+
+This works well with Gorlock's QB64 Layer Library; you can make your program faster by drawing a frame to an image handle and then drawing the image rather than reproducing the frame every loop. Gorlock's QB64 Layer Library can be found here: https://db.tt/MouuHPRe.
+
+
+You will get the hang of the commands after using it for a while. Lets add the example below to our code and see what we get.
+
+
++------------------------------------------------------------------------------+
+|PAINT (1, 1), ctorgb(10)                                                      |
+|a$ = "50 50 C2 R75 T2 R275 C1 D350 C4 L275 T4 L75 C3 U275 T1 R75 T3"          |
+|FRAME a$, FRAME_SINGLE, 0                                                     |
+|FREEFRAME                                                                     |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+So we paint the screen green so we can see the frame. Then we create the instruction string (more on this in a moment). Then we call FRAME and create the frame. The frame is going to be drawn to the instructions of a$, be single thickness, and be drawn on the screen image.
+
+I will describe the instruction string in more detail:
+a$ = "50 50 C2 R75 T2 R275 C1 D75 D275 C4 L275 T4 L75 C3 U275 T1 U75 R75 D75 T3"
+50 50  -  Set the cursor to start at (50, 50)
+   C2  -  Put down an upper left corner
+  R75  -  Move right 75 pixels
+   T2  -  Put down a T that is off a top wall
+ R275  -  Move right 275 pixels
+   C1  -  Put down an upper right corner
+ D350  -  Move down 350 pixels
+   C4  -  Put down a lower right corner
+ L275  -  Move left 275 pixels
+   C3  -  Put down a lower left corner
+ U275  -  Move up 275 pixels
+   T1  -  Put down a T that is off a left wall
+  R75  -  Move right 75 pixels
+   T3  -  Put down a T that is off a right wall
+
+You'll get the hang of it by making your own examples. Lets add a few more examples to our code:
+
+
++------------------------------------------------------------------------------+
+|CLS                                                                           |
+|PAINT (1, 1), ctorgb(10)                                                      |
+|a$ = "75 75 C2 R100 T2 R100 T2 R100 C1 D100 T3 D100 T3 D100 C4 L100 T4 L100 " |
+|a$ = a$ + "T4 L100 C3 U100 T1 U100 T1 R100 X1 R100 X1 D100 X1 L100 X1"        |
+|FRAME a$, FRAME_SINGLE, 0                                                     |
+|SLEEP                                                                         |
+|                                                                              |
+|CLS                                                                           |
+|PAINT (1, 1), ctorgb(10)                                                      |
+|FRAME a$, FRAME_DOUBLE, 0                                                     |
+|SLEEP                                                                         |
+|                                                                              |
+|CLS                                                                           |
+|PAINT (1, 1), ctorgb(10)                                                      |
+|a$ = "150 150 N1 R100 X1 R70 N3 L70 D100 T4 L50 C2 D50 N4 U50 R150 T3 D70 N4 "|
+|a$ = a$ + "U130 N2 P250 Q150 U50 C2 R200 N3"                                  |
+|FRAME a$, FRAME_SINGLE, 0                                                     |
+|FREEFRAME                                                                     |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+The second and third examples show the difference between single and double thickness.
+
+
+Always be sure to free the image handles you loaded using FREEFRAME!
+You do not need to call FREEFRAME if you are going to use LOADFRAME to load a different theme, it will automatically call FREEFRAME before it loads the new images.
+
+Try changing the theme in the LOADFRAME from FRAME_GOLD to some of the other themes and make your own frames, see what you can make!
+
+
+--------------------------------------------------------------------------------
+
+
+I hope you enjoy this library! If you discover an error, think of an idea for a future update, or have a question about the library, please email me at ZGorlock@gmail.com.
+
+
+================================================================================

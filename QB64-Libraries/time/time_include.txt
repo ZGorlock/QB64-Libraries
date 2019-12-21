@@ -1,0 +1,8 @@
+DECLARE DYNAMIC LIBRARY "kernel32"
+    SUB FileTimeToSystemTime (BYVAL lpFileTime AS _OFFSET, BYVAL lpSystemTime AS _OFFSET) 'http://msdn.microsoft.com/en-us/library/windows/desktop/ms724280(v=vs.85).aspx
+    SUB GetSystemTime (BYVAL lpSystemTime AS _OFFSET) 'http://msdn.microsoft.com/en-us/library/windows/desktop/ms724390(v=vs.85).aspx
+    SUB GetTimeZoneInformation (BYVAL pTimeZoneInformation AS _OFFSET) 'http://msdn.microsoft.com/en-us/library/windows/desktop/ms724421(v=vs.85).aspx
+    SUB SystemTimeToFileTime (BYVAL lpSystemTime AS _OFFSET, BYVAL lpFileTime AS _OFFSET) 'http://msdn.microsoft.com/en-us/library/windows/desktop/ms724948(v=vs.85).aspx
+    FUNCTION GetTickCount~& () 'http://msdn.microsoft.com/en-us/library/windows/desktop/ms724408(v=vs.85).aspx
+    FUNCTION GetTimeZoneInformation~& (BYVAL pTimeZoneInformation AS _OFFSET) 'http://msdn.microsoft.com/en-us/library/windows/desktop/ms724421(v=vs.85).aspx
+END DECLARE

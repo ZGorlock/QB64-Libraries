@@ -1,0 +1,44 @@
+QB64 Libraries Dropbox Release Links
+
+libpack					https://db.tt/Mz7FRyUI
+
+/---animation
+|       0.21				https://db.tt/7UysynxN
+|       
++---button
+|       0.32				https://db.tt/m8Lmcdp1
+|       
++---common
+|       0.5				https://db.tt/ligEGY6U
+|       
++---common_slim
+|       0.5				https://db.tt/fB9RUxSZ
+|       
++---download
+|       0.1				https://db.tt/lZ0nHvE8
+|       
++---frame
+|       0.12				https://db.tt/SNpeO2KF
+|       
++---input
+|       0.3				https://db.tt/zH7YyjKq
+|       
++---layer
+|       0.4				https://db.tt/OQwKvISJ
+|       
++---textbox
+|       0.51				https://db.tt/qG5FvT8e
+|       
++---time
+|       0.13				https://db.tt/iQs8rY40
+|       
+\---[other]
+    +---color32
+    |       1.0				https://db.tt/HGlLshlO
+    |       
+    \---math
+    |       2.1				https://db.tt/XcJ9viAx
+    |       
+    \---sprite
+            0.22			https://db.tt/tpY4Azpf
+            

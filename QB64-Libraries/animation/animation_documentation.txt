@@ -1,0 +1,240 @@
+=================DOCUMENTATION FOR GORLOCK'S QB64 LAYER LIBRARY=================
+
+
+This library contains subroutines and functions that allow the programmer to manage animations. Below the entire functionality and use of this library and its subroutines will be explained.
+
+Include this library into your code as shown in the animation_template file found here: https://db.tt/afaZVczK. If you have any additional libraries, you will have to logically combine their templates.
+
+
+================================================================================
+
+
+This library defines several useful constants that you can use in your code.
+
+When you call ANIMATIONSTATUS, you will recieve one of the following values:
++-----------------------------------------+
+|=VALUE=|========CONST========|==Meaning==|
++-------+---------------------+-----------|
+|   0   | ANIMATION_UNCREATED | Uncreated |
+|   1   | ANIMATION_CREATED   | Created   |
+|   2   | ANIMATION_STARTED   | Started   |
+|   3   | ANIMATION_PAUSED    | Paused    | 
+|   4   | ANIMATION_FINISHED  | Finished  |
++-----------------------------------------+
+
+You can use ANIMATION_ALLANIMATIONS as your handle to preform an action to all your animations at once.
+
+When you are creating a new animation with NEWANIMATION, for the behaviour%% parameter, you can have the values ANIMATION_BASIC, ANIMATION_BOUNCE, or ANIMATION_EQUATION. The fof element of the animation structure will be set either to ANIMATION_FX or ANIMATION_FY. For the auto%% parameter you can use ANIMATION_AUTOUPDATE_ON to autoupdate the animation, or ANIMATION_AUTOUPDATE_OFF to keep it manual. For the terminate%% parameter, you can use ANIMATION_AUTOUPDATE_ON to autoterminate the animation, or ANIMATION_AUTOUPDATE_OFF to keep it manual. More on these later.
+
+
+--------------------------------------------------------------------------------
+
+
+I will now provide a logical tutorial for this library.
+I would recommend typing out the examples by hand so that you get a feel for the commands, but you can just copy and paste if you choose. If you copy and paste you will have to delete the first and last character of each line.
+Make sure that you are using animation_template as your template; the examples are just the code that goes in the middle.
+
+
+First lets create a new animation. For this you will use the function NEWANIMATION. It has 9 parameters: x1!, y1!, x2!, y2!, speed!, equation$, behaviour%%, auto%%, and terminate%%. x1! is the starting x position of the animation, y1! is the starting y position, x2! is the ending x position, and y2! is the ending y positions. time! is the amount of time in seconds that the animation will take to complete. auto%% specifies whether the animation will update automatically or if you have to call UPDATEANIMATION to update it. The acceptable values for this parameter are ANIMATION_AUTOUPDATE_OFF and ANIMATION_AUTOUPDATE_ON. terminate%% specifies whether the animation will automatically free itself once it is complete of if you will manually have to call ANIMATIONFREE. The accepable values for this parameter are ANIMATION_AUTOTERMINATE_OFF and ANIMATION_AUTOTERMINATE_ON.
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|a = NEWANIMATION(0, 0, 200, 200, 3, "", ANIMATION_BASIC, _                    |
+|  ANIMATION_AUTOUPDATE_OFF, ANIMATION_AUTOTERMINATE_OFF)                      |
++------------------------------------------------------------------------------+
+
+
+This will create a new animation with handle a that will move from (0, 0) to (200, 200) in 3 seconds.
+The value of ANIMATIONSTATUS(a) at this point would be ANIMATION_CREATED. To start the animation we must call STARTANIMATION a. The following example will let you see a basic animation:
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|a = NEWANIMATION(0, 0, 200, 200, 3, "", ANIMATION_BASIC, _                    |
+|  ANIMATION_AUTOUPDATE_OFF, ANIMATION_AUTOTERMINATE_OFF)                      |
+|STARTANIMATION a                                                              |
+|DO                                                                            |
+|    _LIMIT 16                                                                 |
+|    CLS                                                                       |
+|    UPDATEANIMATION a                                                         |
+|    PRINT ANIMATIONTIME(a)                                                    |
+|    PRINT ANIMATIONSTATUS(a)                                                  |
+|    CIRCLE (ANIMATIONX(a), ANIMATIONY(a)), 10                                 |
+|    _DISPLAY                                                                  |
+|LOOP UNTIL ANIMATIONSTATUS(a) = ANIMATION_FINISHED                            |
+|ANIMATIONFREE a                                                               |
+|END                                                                           |
++------------------------------------------------------------------------------+
+Note you can get rid of the _ in the first line when you move it into your IDE, it is only to let the line fit in the set box width.
+
+
+Run this example and see the result.
+We created a new animation and started it, then 16 times per second we updated the animation, and drew a circle where the animation has progressed to. The two values that are printed are the time that has elapsed during the animation and the status of the animation. When the animation's status is ANIMATION_FINISHED, the program ends.
+
+I introduced a few new commands in this example, I will explain them below:
+
+STARTANIMATION a    -  starts the timer on the animation; after this is called
+                       the value of ANIMATIONSTATUS(a) will equal
+                       ANIMATION_STARTED.
+UPDATEANIMATION a   -  updates the variables in the animation for the new
+                       elapsed time
+ANIMATIONTIME(a)    -  returns the time that has elapsed since the animation was
+                       started
+ANIMATIONSTATUS(a)  -  returns the status of the animation
+ANIMATIONX(a)       -  returns the current x coordinate of the animation
+ANIMATIONY(a)       -  returns the current y coordinate of the animation
+ANIMATIONFREE a     -  frees the animation handle.
+
+Always free an animation handle with ANIMATIONFREE when you are done with it!
+
+
+Lets try using ANIMATION_AUTOUPDATE_ON, now we dont need to call UPDATEANIMATION.
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|a = NEWANIMATION(0, 0, 200, 200, 3, "", ANIMATION_BASIC, _                    |
+|  ANIMATION_AUTOUPDATE_ON, ANIMATION_AUTOTERMINATE_OFF)                       |
+|STARTANIMATION a                                                              |
+|DO                                                                            |
+|    _LIMIT 16                                                                 |
+|    CLS                                                                       |
+|    PRINT ANIMATIONTIME(a)                                                    |
+|    PRINT ANIMATIONSTATUS(a)                                                  |
+|    CIRCLE (ANIMATIONX(a), ANIMATIONY(a)), 10                                 |
+|    _DISPLAY                                                                  |
+|LOOP UNTIL ANIMATIONSTATUS(a) = ANIMATION_FINISHED                            |
+|ANIMATIONFREE a                                                               |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+This may seem easier but it will update the animation 20 times per seconds which will use a bit more CPU in this example. But if we wanted to run the program at 60 fps, the location of the animation would only change every 3 loops. If you used manual updating in that example, then every loop it would update and you would recieve more precise results. Whether you use manual or automatic updating is up to you and the situation.
+Setting terminate to ANIMATION_AUTOTERMINATE_ON will automatically free the animation handle when the animation has completed. In most cases you will use ANIMATION_AUTOTERMINATE_OFF; only when the program is creating many animations for some procedure and you don't want to worry about freeing each one should you use ANIMATION_AUTOTERMINATE_ON.
+
+
+Now lets try using multiple animations at once. When doing this, we can preform a particular subroutine on all the animations at once using ANIMATION_ALLANIMATIONS for the handle instead of calling the subroutine for each animation. Note that this will only work with subroutines, functions can only return one value and therefore can only deal with a single animation at a time.
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|DIM b AS INTEGER                                                              |
+|a = NEWANIMATION(0, 0, 200, 200, 3, "", ANIMATION_BASIC, _                    |
+|  ANIMATION_AUTOUPDATE_OFF, ANIMATION_AUTOTERMINATE_OFF)                      |
+|b = NEWANIMATION(200, 0, 0, 200, 3, "", ANIMATION_BASIC, _                    |
+|  ANIMATION_AUTOUPDATE_OFF, ANIMATION_AUTOTERMINATE_OFF)                      |
+|STARTANIMATION ANIMATION_ALLANIMATIONS                                        |
+|DO                                                                            |
+|    _LIMIT 16                                                                 |
+|    CLS                                                                       |
+|    UPDATEANIMATION ANIMATION_ALLANIMATIONS                                   |
+|    CIRCLE (ANIMATIONX(a), ANIMATIONY(a)), 10                                 |
+|    CIRCLE (ANIMATIONX(b), ANIMATIONY(b)), 10                                 |
+|    _DISPLAY                                                                  |
+|LOOP UNTIL ANIMATIONSTATUS(a) = ANIMATION_FINISHED AND _                      |
+|  ANIMATIONSTATUS(a) = ANIMATION_FINISHED                                     |
+|ANIMATIONFREE ANIMATION_ALLANIMATIONS                                         |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+
+You can call STOPANIMATION to pause an animation, if an animation is paused you can call STARTANIMATION to start it again. While an animation is paused, the value of ANIMATIONSTATUS(a) will be ANIMATION_PAUSED. In the following example, press Space to start and stop the animation.
+
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|a = NEWANIMATION(0, 0, 200, 200, 3, "", ANIMATION_BASIC, _                    |
+|  ANIMATION_AUTOUPDATE_OFF, ANIMATION_AUTOTERMINATE_OFF)                      |
+|STARTANIMATION a                                                              |
+|DO                                                                            |
+|    _LIMIT 16                                                                 |
+|    CLS                                                                       |
+|    UPDATEANIMATION a                                                         |
+|    PRINT ANIMATIONTIME(a)                                                    |
+|    PRINT ANIMATIONSTATUS(a)                                                  |
+|    CIRCLE (ANIMATIONX(a), ANIMATIONY(a)), 10                                 |
+|    IF INKEY$ = CHR$(32) THEN                                                 |
+|        SELECT CASE ANIMATIONSTATUS(a)                                        |
+|            CASE ANIMATIoN_STARTED                                            |
+|                STOPANIMATION a                                               |
+|            CASE ANIMATION_PAUSED                                             |
+|                STARTANIMATION a                                              |
+|        END SELECT                                                            |
+|    END IF                                                                    |
+|    _DISPLAY                                                                  |
+|LOOP UNTIL ANIMATIONSTATUS(a) = ANIMATION_FINISHED                            |
+|ANIMATIONFREE a                                                               |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+You can use ANIMATION_BOUNCE, or ANIMATION_EQUATION instead of ANIMATION_BASIC for the behaviour parameter for different effects. ANIMATION_BOUNCE will oscilate between the start and end point with a frequency of 1/speed!. ANIMATION_EQUATION will trace the equation specified by equation$. This can be a function of X or Y and this will be automatically determined. Remember that the coordinate system on the screen is different from the cartesian coordinate system so you might need some adjustments to your equation. Below is an example of the use of ANIMATION_BOUNCE and ANIMATION_EQUATION.
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|a = NEWANIMATION(200, 50, 500, 50, 1, "", ANIMATION_BOUNCE, _                 |
+|  ANIMATION_AUTOUPDATE_OFF, ANIMATION_AUTOTERMINATE_OFF)                      |
+|STARTANIMATION a                                                              |
+|DO                                                                            |
+|    _LIMIT 16                                                                 |
+|    CLS                                                                       |
+|    UPDATEANIMATION a                                                         |
+|    CIRCLE (ANIMATIONX(a), ANIMATIONY(a)), 10                                 |
+|    _DISPLAY                                                                  |
+|LOOP UNTIL ANIMATIONSTATUS(a) = ANIMATION_FINISHED                            |
+|ANIMATIONFREE a                                                               |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|a = NEWANIMATION(0, 0, 640, 0, 5, "320 - 100 * sin(.02 * x)", _               |
+|  ANIMATION_EQUATION, ANIMATION_AUTOUPDATE_OFF, ANIMATION_AUTOTERMINATE_OFF)  |
+|STARTANIMATION a                                                              |
+|DO                                                                            |
+|    _LIMIT 16                                                                 |
+|    CLS                                                                       |
+|    UPDATEANIMATION a                                                         |
+|    CIRCLE (ANIMATIONX(a), ANIMATIONY(a)), 10                                 |
+|    _DISPLAY                                                                  |
+|LOOP UNTIL ANIMATIONSTATUS(a) = ANIMATION_FINISHED                            |
+|ANIMATIONFREE a                                                               |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+You can also use this for linear animations. Just set y1! and y2! to 0 and only read ANIMATIONX over time:
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|a = NEWANIMATION(0, 0, 200, 200, 3, "", ANIMATION_BASIC, _                    |
+|  ANIMATION_AUTOUPDATE_OFF, ANIMATION_AUTOTERMINATE_OFF)                      |
+|STARTANIMATION a                                                              |
+|DO                                                                            |
+|    _LIMIT 16                                                                 |
+|    CLS                                                                       |
+|    UPDATEANIMATION (a)                                                       |
+|    PRINT INT(ANIMATIONX(a))                                                  |
+|    _DISPLAY                                                                  |
+|LOOP UNTIL ANIMATIONSTATUS(a) = ANIMATION_FINISHED                            |
+|ANIMATIONFREE a                                                               |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+This example animates x from 0 to 200 in 3 seconds.
+If you want to animate something in three or more dimensions, you will have to use multiple animation structures.
+
+
+--------------------------------------------------------------------------------
+
+
+I hope you enjoy this library! If you discover an error, think of an idea for a future update, or have a question about the library, please email me at ZGorlock@gmail.com.
+
+
+================================================================================

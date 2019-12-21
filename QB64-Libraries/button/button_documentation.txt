@@ -1,0 +1,280 @@
+================DOCUMENTATION FOR GORLOCK'S QB64 BUTTON LIBRARY=================
+
+
+This library contains subroutines and functions that allow the programmer to create and manage buttons. Below the entire functionality and use of this library and its subroutines will be explained.
+
+Include this library into your code as shown in the button_template file found here: https://db.tt/HdqSExxG. If you have any additional libraries, you will have to logically combine their templates.
+
+
+================================================================================
+
+
+This library defines several useful constants that you can use in your code.
+
+
+When you get the status of a button using BUTTONSTATUS, you will recieve one of the following values:
+
++------------------------------------------+
+|=======CONST=======|====STATUS====|=VALUE=|
++-------------------+--------------+-------+
+| BUTTON_UNCREATED  |  Uncreated   | FALSE |
+| BUTTON_CREATED    |  Created     | 1     |
+| BUTTON_STAND      |  Stand       | 2     |
+| BUTTON_HOVER      |  Hover       | 3     |
+| BUTTON_ACTION     |  Action      | 4     |
+| BUTTON_LOCKED     |  Locked      | 5     |
++------------------------------------------+
+
+
+When you get a button's click status using BUTTONCLICK, you will recieve one of the following values:
+
++----------------------------------------------------+
+|======CONST======|=LCLICK=|=RCLICK=|=MCLICK=|=VALUE=|
++-----------------+--------+--------+--------+-------+
+| BUTTON_NOCLICK  | FALSE  | FALSE  | FALSE  | FALSE |
+| BUTTON_LCLICK   | TRUE   | FALSE  | FALSE  | 1     |
+| BUTTON_RCLICK   | FALSE  | TRUE   | FALSE  | 2     |
+| BUTTON_MCLICK   | FALSE  | FALSE  | TRUE   | 3     |
+| BUTTON_LRCLICK  | TRUE   | TRUE   | FALSE  | 4     |
+| BUTTON_LMCLICK  | TRUE   | FALSE  | TRUE   | 5     |
+| BUTTON_RMCLICK  | FALSE  | TRUE   | TRUE   | 6     |
+| BUTTON_LRMCLICK | TRUE   | TRUE   | TRUE   | 7     |
++----------------------------------------------------+
+
+
+When you get the value of a button using BUTTONVALUE, you will recieve one of the following values:
+
++------------------------------+
+|====CONST====|=STATUS=|=VALUE=|
++-------------+--------+-------+
+| BUTTON_OFF  |  Off   | FALSE |
+| BUTTON_ON   |  On    | TRUE  |
++------------------------------+
+
+
+When creating a new button, you can set the show%% parameter with BUTTON_HIDE or BUTTON_SHOW, and you can set the auto%% parameter with BUTTON_AUTOUPDATE_OFF, or BUTTON_AUTOUPDATE_ON.
+
+You can use BUTTON_ALLBUTTONS as a handle to preform an action to all your buttons at once.
+
+
+--------------------------------------------------------------------------------
+
+
+I will now provide a logical tutorial for this library.
+I would recommend typing out the examples by hand so that you get a feel for the commands, but you can just copy and paste if you choose. If you copy and paste you will have to delete the first and last character of each line.
+Make sure that you are using button_template as your template; the examples are just the code that goes in the middle.
+
+
+First we have to load a button spritesheet. There are a number of example buttons that can be used available here: https://db.tt/A6M8MXvW. Note that these are not required to run the library, they are only sample buttons, but it is a good set of buttons and I spent a lot of time compiling them, so I would encourage its use. I will show you how to make your own button spritesheet later in the documentation.
+We use NEWBUTTONTEMPLATE to load the spritesheet, this way we do not have to load the same images multiple times to use multiple instances of a single button. Once a button spritesheet it loaded, you can create a button that is linked to it with NEWBUTTON.
+NEWBUTTONTEMPLATE has only one parameter: the string of the image file of the button set.
+NEWBUTTON has 5 parameters: the handle of the button template from which it will draw its images, the initial value of the button, typically this will be BUTTON_OFF, but if you wish to initiate the button in the on position, you can use BUTTON_ON. Next there is the button status, for this you will typically use BUTTON_CREATED, but if you want the button, for example, to start of locked without having to lock it, you could use BUTTON_LOCKED (see the constants for BUTTONSTATUS to see a full list of available values for this parameter). The fourth and fifth parameter are show%% and auto%%, these determine the visibility status and autoupdate status of the button, for these you can use BUTTON_SHOW or BUTTON_HIDE, and BUTTON_AUTOUPDATE_ON or BUTTON_AUTOUPDATE_OFF, respectively. If you choose to turn autoupdate on, the button will automatically update so you do not need to call UPDATEBUTTON.
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|DIM b AS INTEGER                                                              |
+|a = NEWBUTTONTEMPLATE("button\arrow_blue_up_gold.png")                        |
+|b = NEWBUTTON(a, BUTTON_OFF, BUTTON_CREATED, BUTTON_SHOW, _                   |
+|  BUTTON_AUTOUPDATE_OFF)                                                      |
++------------------------------------------------------------------------------+
+
+
+You can change the spritesheet$ parameter of NEWBUTTONTEMPLATE to whichever button you would like to load.
+If your button does not have distinct on and off positions, then it will not matter whether you set it to BUTTON_ON or BUTTON_OFF. More on this later.
+You can always change the visiibility status of a button by calling HIDEBUTTON or SHOWBUTTON. These both take one parameter: the handle of the button.
+
+Now that we have loaded our button, lets put it somewhere. This is done with PUTBUTTON:
+
+
++------------------------------------------------------------------------------+
+|PUTBUTTON 200, 200, b, 0                                                      |
++------------------------------------------------------------------------------+
+
+
+This will put button b at (200, 200) on destination image 0.
+Note that this will center the button image around (200, 200).
+
+We can also set the area of a button directly using SETBUTTON. This gives us greater control over the location and extent of the button, we can also stretch the button to increase its size of skew it.
+
+
++------------------------------------------------------------------------------+
+|SETBUTTON 150, 150, 250, 250, b, 0                                            |
++------------------------------------------------------------------------------+
+
+
+This will set button b to the area defined by a rectangle with upper left corner (150, 150) and lower right corner (250, 250) on destination image 0.
+
+We use UPDATEBUTTON to update a button and PRINTBUTTON to print a button to its area. Surprise.
+Lets make a little program to see button b in action:
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|DIM b AS INTEGER                                                              |
+|a = NEWBUTTONTEMPLATE("button\arrow_blue_up_gold.png")                        |
+|b = NEWBUTTON(a, BUTTON_OFF, BUTTON_CREATED, BUTTON_SHOW, _                   |
+|  BUTTON_AUTOUPDATE_OFF)                                                      |
+|PUTBUTTON 200, 200, b, 0                                                      |
+|                                                                              |
+|DO                                                                            |
+|    _LIMIT 16                                                                 |
+|    GETINPUT                                                                  |
+|    UPDATEBUTTON b                                                            |
+|    CLS                                                                       |
+|    PRINTBUTTON b                                                             |
+|    _DISPLAY                                                                  |
+|LOOP UNTIL ESC                                                                |
+|BUTTONFREE b                                                                  |
+|BUTTONTEMPLATEFREE a                                                          |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+Always be sure to free your buttons and templates when you are done with them. It is recommended you free buttons before buttontemplates because you will get an error if a button tries to print its image when the image no longer exists.
+
+Ok, so we put a button on the screen but how can we keep track of it?
+We can call BUTTONSTATUS and BUTTONVALUE to return the status and value of a button. The return values of these functions are defined in the constants section at the beginning of this documentation.
+We can use BUTTONCLICK to return the click value of a button, this will return one of the BUTTONCLICK constants enumerated at the beginning of this documentation. We can also use BUTTONHIT to determine when a button has been hit; this will give us a more usable but less specific value than BUTTONCLICK does. We can use BUTTONTIME to return the amount of time since the last interaction with a button; in other words, the amount of time a button has retained its current BUTTONSTATUS value.
+
+Lets add some code so we can experiment and see how these values change as we interact with the button. Add this bit of code in between the PRINTBUTTON line and the _DISPLAY line of the code above:
+
+
++------------------------------------------------------------------------------+
+|    PRINT BUTTONSTATUS(b)                                                     |
+|    PRINT BUTTONVALUE(b)                                                      |
+|    PRINT BUTTONCLICK(b)                                                      |
+|    PRINT BUTTONHIT(b)                                                        |
+|    PRINT BUTTONTIME(b)                                                       |
++------------------------------------------------------------------------------+
+
+
+Lets try changing the button spritesheet we load to "button\checkbox_green_copper.png". This way we can see the distinction between a button that is on and off. Run the code again and watch the BUTTONVALUE change.
+
+Try changing the initial status to BUTTON_LOCKED. This will lock the button so that you can not interact with it, it will also appear darker. You could also initiate this status using LOCKBUTTON, or return it to normal with UNLOCKBUTTON. LOCKBUTTONTOGGLE will toggle between the two.
+
+Lets try putting one button on top of another button:
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|DIM b AS INTEGER                                                              |
+|DIM c AS INTEGER                                                              |
+|a = NEWBUTTONTEMPLATE("button\arrow_blue_up_gold.png")                        |
+|b = NEWBUTTON(a, BUTTON_OFF, BUTTON_CREATED, BUTTON_SHOW, _                   |
+|  BUTTON_AUTOUPDATE_OFF)                                                      |
+|c = NEWBUTTON(a, BUTTON_OFF, BUTTON_CREATED, BUTTON_SHOW, _                   |
+|  BUTTON_AUTOUPDATE_OFF)                                                      |
+|PUTBUTTON 200, 200, b, 0                                                      |
+|SETBUTTON 150, 150, 250, 250, c, 0                                            |
+|                                                                              |
+|DO                                                                            |
+|    _LIMIT 16                                                                 |
+|    GETINPUT                                                                  |
+|    UPDATEBUTTON BUTTON_ALLBUTTONS                                            |
+|    CLS                                                                       |
+|    PRINTBUTTON BUTTON_ALLBUTTONS                                             |
+|    _DISPLAY                                                                  |
+|LOOP UNTIL ESC                                                                |
+|BUTTONFREE BUTTON_ALLBUTTONS                                                  |
+|BUTTONTEMPLATEFREE a                                                          |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+We can't see button b because it is printed first... Let's try bringing it to the front with BUTTONBRINGTOFRONT. Add this line after the SETBUTTON line:
+
+
++------------------------------------------------------------------------------+
+|BUTTONBRINGTOFRONT b                                                          |
++------------------------------------------------------------------------------+
+
+
+Ah, there we go. We could have accomplished the same thing by calling BUTTONSENDTOBACK on button c.
+
+You can see the queue value of a button by calling BUTTONQUEUE.
+You can also manually set the queue value of a button using BUTTONSETQUEUE. Remember that a larger queue values are printed last and therefore above the lower queue values.
+
+If you wish to create a copy of a button, you can use CLONEBUTTON. This takes the handle of the button to clone as a parameter and returns the handle of the clone button. This button will retain all of the properties of the original button.
+You can also switch the location of two buttons in the array by using SWAPBUTTON. This takes two handles as parameters and switches the properties of each to the handle of the other. I can't really think of a use for this but maybe you can.
+
+
+--------------------------------------------------------------------------------
+
+
+If you looked at one of the button spritesheets your will have noticed that it is actually 8 seperate images, 2 rows of 4 images each. It is important that it is in this form because that is how the library loads the frames. Below is a diagram showing the meaning of each of the images:
+
+
+         BUTTON SPRITESHEET
+      +-----+-----+-----+-----+
+      |     |     |     |     |
+      |  1  |  2  |  3  |  4  |
+      |     |     |     |     |
+      +-----+-----+-----+-----+
+      |     |     |     |     |
+      |  5  |  6  |  7  |  8  |
+      |     |     |     |     |
+      +-----+-----+-----+-----+
++---------------------------------------+
+|=BUTTON=|====VALUE====|=====STATUS=====|
++------ -+-------------+----------------+
+|   1    |  BUTTON_OFF | BUTTON_STAND   |
+|   2    |  BUTTON_OFF | BUTTON_HOVER   |
+|   3    |  BUTTON_OFF | BUTTON_ACTIVE  |
+|   4    |  BUTTON_OFF | BUTTON_LOCKED  |
+|   5    |  BUTTON_ON  | BUTTON_STAND   |
+|   6    |  BUTTON_ON  | BUTTON_HOVER   |
+|   7    |  BUTTON_ON  | BUTTON_ACTIVE  |
+|   8    |  BUTTON_ON  | BUTTON_LOCKED  |
++---------------------------------------+
+
+
+The top row is images of the button when its value is BUTTON_OFF in various different statuses. The bottom row is the same but for BUTTON_ON.
+
+If you create your own buttons, the dimensions of each button can be whatever you want as long as all of the widths are consitant as well as all of heights.
+
+
+You already have 328 buttons to work with that I have provided as examples. The button schema is shown below.
+
+There are 10 different buttons:
+   arrow_down
+   arrow_down_minus
+   arrow_left
+   arrow_left_minus
+   arrow_right
+   arrow_right_plus
+   arrow_up
+   arrow_up_plus
+   checkbox
+   tick
+
+Within each of these buttons, there are 4 different base colors:
+   black
+   blue
+   green
+   red
+
+Within each of these colors, there are 8 frame colors:
+   bronze
+   copper
+   gold
+   lava
+   mahogany
+   rust
+   silver
+   wood
+
+These are labelled in a constant way: '%button%_%color%_%frame%.png'.
+
+That gives us 10 x 4 x 8, or 320 buttons.
+
+There are also 8 selector buttons. These are only available in one color (blue) and 8 frames. For this button, the '%color%_' portion of the name is ignored.
+
+
+--------------------------------------------------------------------------------
+
+
+I hope you enjoy this library! If you discover an error, think of an idea for a future update, or have a question about the library, please email me at ZGorlock@gmail.com.
+
+
+================================================================================

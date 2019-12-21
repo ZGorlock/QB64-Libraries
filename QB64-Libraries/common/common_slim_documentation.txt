@@ -1,0 +1,314 @@
+=============DOCUMENTATION FOR GORLOCK'S QB64 COMMON_SLIM LIBRARY===============
+
+
+This library contains basic functions and subroutines that help the programmer write code more easily. Below the entire functionality and use of this library and its functions and subroutines will be explained.
+
+Include this library into your code as shown in the common_slim_template file found here: https://db.tt/SJKeLEp6. If you have any additional libraries, you will have to logically combine their templates.
+
+
+================================================================================
+
+
+This library does not have a common theme like my other libraries; it is just a collection of definitions, libraries, and subroutines that I seem to find need of in most every program I write.
+
+This is the slim version of the library. There is also a full version common library for larger programs that need a more comprehensive library. If you are using any of my other libraries, you MUST have the full version of this library. This library can be implimented into code in only two lines because it does not have any code that needs to be manually included in your program. The common library and the common_slim library share mostly all their functions and subroutines, but their initiative processes differ: This library does not have the capability to determine the Windows version, get the work area of the screen, get the program and dektop hwnd handles, or perform single instance checking. It is also lacking the errorhandler and the error log, the GetLastError MSDN function, usage of Programname and Version, and it is missing the cleanup and help gosubs.
+If you would like to use the full common library, it can be found here: https://db.tt/k9Tb6QJ4. The common_init, common_include, and common_documentation file download locations can be found in the library header.
+
+
+--------------------------------------------------------------------------------
+
+
+This library defines several useful constants that you can use in your code.
+Primarily there are TRUE and FALSE. TRUE is equal to -1 and FALSE is equal to 0. These are vital to this library and my other libraries, but feel free to make use of them yourself.
+
+There are also 7 mathematical constants defined for use equations. The available constants are enumerated below:
++--------------------------------------------+
+|=CONST=|========NAME========|=====VALUE=====|
++-------+--------------------+---------------+
+| E     |  Euler's Number    | 2.7182818285  |
+| GR    |  Golden Ratio      | 1.6180339888  |
+| PI    |  Pi                | 3.1415926536  |
+| PI2   |  2 * Pi            | 6.2831853072  |
+| SQR2  |  SQR(2)            | 1.4142135623  |
+| SQR3  |  SQR(3)            | 1.7320508075  |
+| SQR5  |  SQR(5)            | 2.2360679774  |
++--------------------------------------------+
+
+You when using the BaseConv function, you can use the following constants to define bases:
++------------------------------------+
+|==BASE==|=======CONST=======|=VALUE=|
++--------+-------------------+-------+
+|  2     |  BASE_BINARY      |  2    |
+|  8     |  BASE_OCTAL       |  8    |
+|  10    |  BASE_DECIMAL     |  10   |
+|  12    |  BASE_DUODECIMAL  |  12   |
+|  16    |  BASE_HEXIDECIMA  |  16   |
+|  60    |  BASE_SEXAGESIMAL |  60   |
+|  64    |  BASE_BASE64      |  64   |
+|  256   |  BASE_BYTE        |  256  |
++------------------------------------+
+
+There are also several other shared variables that are set at initiation.
+
+The following variables are for common strings:
+   Crlf   =  CHR$(13) + CHR$(10)
+   Null   =  CHR$(0)
+   Q      =  "
+   Slash  =  \ (Windows)
+             / (MacOS, Linux)
+
+There are 3 variables to define the program window: SCRX, SCRY, and SCRZ. These are intiatially set to 640, 480, and 32 respectively. The screen is also set to an image with these dimesions at the end of the library initation. If you prefer a different screen size or mode, you can change the values of the variables and reset the screen image, or you can delete this part of the intiation from common_slim_init and deal with your screen on your own.
+
+Aside from the program window dimensions, there are variables to store information information about the monitor dimensions. MONITORX and MONITORY represent the width and height of your monitor in pixels.
+
+
+--------------------------------------------------------------------------------
+
+
+There are several TYPEs defined in this library that you should be familiar with when using this library:
+
+TYPE RECT
+    left AS LONG
+    top AS LONG
+    right AS LONG
+    bottom AS LONG
+END TYPE
+The RECT structure is a Windows structure that specifies the location of a rectangle on a 2D coordinate plane with upper left corner (left&, top&) and lower right corner (right&, bottom&).
+
+TYPE COORDINATE
+    x AS DOUBLE
+    y AS DOUBLE
+END TYPE
+The COORDINATE structure defines a coordinate point (x##, y##).
+
+TYPE RANGE
+    min AS DOUBLE
+    max AS DOUBLE
+END TYPE
+The RANGE structure defines a range of values between min## and max##.
+
+
+--------------------------------------------------------------------------------
+
+
+I will now explain each of the subroutines and functions in this library.
+
+
+SUB FULLSCREEN ()
+This subroutine toggles the program window between _FULLSCREEN and _FULLSCREEN _OFF.
+The current state of the program window can be found by testing the value console.fs. This variable can have one of two values:
+      0  -  FULLSCREEN_OFF   -  The program window is not currently in fullscreen mode
+     -1  -  FULLSCREEN_ON    -  The program window is currently in fullscreen mode
+
+
+
+SUB HIDESCREEN ()
+This subroutine toggles the program window between _SCREENHIDE and _SCREENSHOW.
+The current state of the program window can be found by testing the value console.hs. This variable can have one of two values:
+      0  -  HIDESCREEN_OFF   -  The program window is currently in _SCREENSHOW mode
+     -1  -  HIDESCREEN_ON    -  The program window is currently in _SCREENHIDE mode
+Be careful with this function; if you are relying on user input to turn the screen back to _SCREENSHOW, it might be difficult to get the user input to your program.
+
+
+
+SUB MAPRECT (s&, sl&, st&, sr&, sb&, d&, dl&, dt&, dr&, db&)
+This subroutine uses _MAPTRIANGLE to move a rectangular image from one location to another. The benefits to using this over calling _MAPTRIANGLE yourself is ease of use; most of the time we are trying to move a rectangular image area anyways. This subroutine will copy a rectangular area of image source s& with upper left corner (sl&, st&) and lower right corner (sr&, sb&) to a rectangular area on image destination d& with upper left corner (dl&, dt&) and lower right corner (dr&, db&).
+
+
+
+SUB resetfile (filename$)
+This subroutine clears a file. The only parameter is the string of the location and name (C:\Folder\folder\x.txt) or relative location (x.txt) of the file you wish to reset. If you specify a file that does not exist, it will create an empty file, however if you specify a directory location that does not yet exist, you will recieve an error. If you specify a file that already exists, it will empty the file of content.
+File access number 30 is reserved for this subroutine. If you try to use file access number 30 you will recieve an error.
+
+
+
+SUB SaveBMP (x1%, y1%, x2%, y2%, image&, filename$)
+This subroutine saves a rectangular area of an image to a BMP file. This subroutine is used by the SCREENSHOT subroutine, but it could be used by a programmer as well. The image to take the area from is specified by the handle image&. The rectangular area is specified by the first four parameters; a rectangle with upper left corner (x1%, y1%) and lower right corner (x2%, y2%). The coordinates of an image go from (0, 0) to (_WIDTH - 1, _HEIGHT - 1). The file to export the image to is specified with filename$. This must be a absolute location (C:\Folder\folder\x.bmp) or a relative location (x.bmp). If a file with that name already exists, it will automatically be overwritten.
+You can use a value of 0 for image& to specify the current program screen, or _SCREENIMAGE for the current monitor image.
+
+
+
+SUB SCREENSHOT (region%%, fileloc$, filename$)
+This subroutine saves an image of the screen to a file using the SaveBMP subroutine. The parameters determine where and what type of image is saved. The parameter region%% determine what image the screenshot will be taken of, the acceptable values for this parameter are specified below:
+      0  -  SCREENSHOT_WINDOW   -  A screenshot of only the program window will be produced
+     -1  -  SCREENSHOT_MONITOR  -  A screenshot of the entire monitor image will be produced
+The location to save the bitmap image is specified by fileloc$ and filename$. fileloc$ is the directory to save the image without the terminating \ (C:\Folder\folder). If this value is left empty, Ssloc is used instead. To save screenshots in the program folder, use "" for fileloc$ and have Ssloc set to "". filename$ specifies the name of the bitmap image (image001). Note that the .bmp should be excluded from this; it will be automatically added. If this parameter is left empty, the current TSTAMP is used; this will name the image with a timestamp in the form "YYYYMMDDHHMMSS".
+
+
+
+FUNCTION BaseConv$ (basei%, basef%, num$)
+This function converts a number from one base to another. Make sure that you send the number as a string num$. To indicate the bases, you can use the constants enumerated above, or you can just enter the number of the base. You can not use bases below 2 or above 256. The number you send the function can be pretty large (although I am not sure how large), but incredibly large numbers will not work correctly. You can also have decimals in your number.
+Note that the character sets for bases above hexidecimal (aside from Base64 and Byte) may be incorrect. From base 2 to base 89 except 64, it uses the character set defined in CHARSET_STANDARD. For bases larger than 89, it will just use the 256 ASCII values to indicate the digits.
+
++------------------------------------------------------------------------------+
+|a$ = "543.487"                                                                |
+|PRINT a$                                                                      |
+|a$ = BaseConv(BASE_DECIMAL, BASE_HEXIDECIMAL, a$)                             |
+|PRINT a$                                                                      |
+|PRINT BaseConv(BASE_HEXIDECIMAL, BASE_DECIMAL, a$)                            |
++------------------------------------------------------------------------------+
+
+
+
+FUNCTION chance` (p!)
+This function preforms a chance operation of probability p! and returns the boolean TRUE if the event occured, and FALSE if it did not. p! should be a value between 0 and 1.
+Note that this function does not inheritly randomize itself; you need to RANDOMIZE on your own as needed.
+
+
+
+FUNCTION ctorgb& (c%%)
+This function converts a 4bit color to a 32bit color. You must use this convertion when using the default colors in a 32bit screen. You could alternatively use SMcNeill's 32bit Color Constants which can be found here: https://db.tt/mBFF5MT0.
+If you want to draw a circle with color 15 but in a 32bit color screen, you can use something like this:
+
++------------------------------------------------------------------------------+
+|CIRCLE (100, 100), 20, ctorgb(15)                                             |
++------------------------------------------------------------------------------+
+
+The acceptable parameter values for c%% are enumerated below:
+
++------------------------------------+
+|==c==|=====Colour=====|==ctorgb(c)==|
++-----+----------------+-------------+
+|  0  |  Black         | 4278190080  |
+|  1  |  Dark Blue     | 4278190248  |
+|  2  |  Dark Green    | 4278233088  |
+|  3  |  Dark Cyan     | 4278233256  |
+|  4  |  Dark Red      | 4289200128  |
+|  5  |  Dark Magenta  | 4289200296  |
+|  6  |  Dark Yellow   | 4289221632  |
+|  7  |  Light Grey    | 4289243304  |
+|  8  |  Dark Grey     | 4283716692  |
+|  9  |  Blue          | 4283716860  |
+| 10  |  Green         | 4283759700  |
+| 11  |  Cyan          | 4283759868  |
+| 12  |  Red           | 4294726740  |
+| 13  |  Magenta       | 4294726908  |
+| 14  |  Yellow        | 4294769748  |
+| 15  |  White         | 4294769916  |
++------------------------------------+
+Any input value aside from those specified will return 4278190080, Black.
+
+
+
+FUNCTION degtorad! (d!)
+This function converts an angle d! in degrees to an angle in randians. The return value is the angle in radians.
+
+
+
+FUNCTION dice& (s&)
+This function simulates a dice roll using a dice with s& sides. The return value is the result of the roll.
+Note that this function does not inheritly randomize itself; you need to RANDOMIZE on your own as needed.
+
+
+
+FUNCTION distance# (x1!, y1!, x2!, y2!)
+This function calculates the distance between point (x1!, y1!) and point (x2!, y2!). The return value is the distance between the two points.
+
+
+
+FUNCTION filetitle$ (f$)
+This functions takes a filename f$ and returns the title of it. The return value is the file's title. For example, if f$ = "C:\Folder\folder\x.txt", the function would return "x".
+
+
+
+FUNCTION filetype$ (f$)
+This functions takes a filename f$ and returns the file type of it. The return value is the file type. For example, if f$ = "C:\Folder\folder\x.txt", the function would return ".txt".
+
+
+
+FUNCTION isonbox` (x!, y!, x1!, y1!, x2!, y2!)
+This function determines is a point (x!, y!) is within the area of a rectangle with upper left corner (x1!, y1!) and lower right corner (x2!, y2!). The return value is TRUE if the point lies within the area of the rectangle and FALSE is it does not.
+
+
+
+FUNCTION midpoint# (p1!, p2!)
+This functions determines the midvalue of two values, p1! and p2!. The return value is the midpoint.
+
+
+
+FUNCTION pointoncirclex! (x!, y!, r!, a!)
+This function returns the x coordinate of the point on the circumference at an angle of a! radians of a circle with a center (x!, y!) with a radius r!. The return value is the x coordinate of the point.
+
+
+
+FUNCTION pointoncircley! (x!, y!, r!, a!)
+This function returns the y coordinate of the point on the circumference at an angle of a! radians of a circle with a center (x!, y!) with a radius r!. The return value is the y coordinate of the point.
+
+
+
+FUNCTION radtodeg! (r!)
+This function converts an angle r! in radians to an angle in degrees. The return value is the angle in degrees.
+
+
+
+FUNCTION rangepick& (s AS RANGE)
+This function randomly chooses a value within the range of values specified by a RANGE structure s. Review the RANGE structure at the beginning of this documentation. The return value is the randomly chosen value.
+Note that this function does not inheritly randomize itself; you need to RANDOMIZE on your own as needed.
+
+
+
+FUNCTION RECTcollide` (a AS RECT, b AS RECT)
+This function takes two RECT structures as parameters and returns TRUE if the two RECT structures are overlapping or touching, or FALSE if they are not.
+
+
+
+FUNCTION remfilesuffix$ (f$)
+This functions takes a filename f$ and returns the filename with the file type removed. The return value is the filename without the file type extension. For example, if f$ = "C:\Folder\folder\x.txt", the function would return "C:\Folder\folder\x".
+
+
+
+FUNCTION TSTAMP$ ()
+This function generates a timestamp of the current time in the format "YYYYMMDDHHMMSS". The return value is this timestamp.
+There are more diverse timestamp functions in Gorlock's QB64 Input Library which can be found here: https://db.tt/DffOJN6z.
+
+
+
+FUNCTION TRIM$ (s$)
+This function removes the spaces on both the left and right of a string s$. This function returns the equivalent of LTRIM$(RTRIM$(s$)).
+
+
+
+FUNCTION trimdec# (n##, d%%)
+This function trims a number n## to d%% decimal places with proper rounding. The return value is the trimmed number.
+
++------------------------------------------------------------------------------+
+|FOR x = 0 TO 10                                                               |
+|    PRINT trimdec(PI, x)                                                      |
+|NEXT x                                                                        |
++------------------------------------------------------------------------------+
+
+
+
+FUNCTION TRIMnum$ (n!)
+This function removes the spaces on both the left and right of a number n!. This function returns the equivalent of LTRIM$(RTRIM$(STR$(s))). The return value is a trimmed string of the number n!.
+
+
+
+FUNCTION UnicodeToANSI$ (u$)
+This function converts Unicode characters to ANSI characters. This is not guarenteed to work, but works for reading files, an MP3 file for example. You might read the song title as "L i v i n '   O n   A   P r a y e r . m p 3 ". This function, given that for u$, will return "Livin' On A Prayer.mp3".
+
+
+
+FUNCTION URLCASE$ (s$)
+This function returns a URL-acceptable version of the string it is passed.
+
+
+
+FUNCTION zeroset$ (n!, z%%)
+This function creates a string from a number n! of defined length z%%. If n! does not have length z%%, then the string is preceded by zeros to reach length z%%, otherwise it is trimmed from the right. This function was intended to help with writing times from variables: 9 becomes 09, but I am sure there are other uses for it.
+
++------------------------------------------------------------------------------+
+|r = INT(RND * 100000 + 1)                                                     |
+|PRINT r                                                                       |
+|PRINT zeroset$(r, 3)                                                          |
+|PRINT zeroset$(r, 10)                                                         |
++------------------------------------------------------------------------------+
+
+
+--------------------------------------------------------------------------------
+
+
+I hope you enjoy this library! If you discover an error, think of an idea for a future update, or have a question about the library, please email me at ZGorlock@gmail.com.
+
+
+================================================================================

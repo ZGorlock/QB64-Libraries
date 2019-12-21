@@ -1,0 +1,248 @@
+=================DOCUMENTATION FOR GORLOCK'S QB64 LAYER LIBRARY=================
+
+
+This library contains subroutines that allow the programmer to handle their screen image as layers. Below the entire functionality and use of this library and its subroutines will be explained.
+
+Include this library into your code as shown in the layer_template file found here: https://db.tt/aAK3LKpL. If you have any additional libraries, you will have to logically combine their templates.
+
+Load your fonts into the shared fonts() array!
+You can not have more than 96 fonts loaded!
+DO NOT use a font that isnt in fonts() to print text on a layer!
+DO NOT print text other than the default font on an image not in layers() unless you make sure to manually reset to _FONT 16 with the layer as the destination after printing the text!
+
+
+================================================================================
+
+
+This library defines several useful constants that you can use in your code.
+
+You can use LAYER_ALLLAYERS as your handle to preform an action to all your layers at once.
+The other constants are specific to a single function's or sub's parameter and will be explained then.
+
+
+--------------------------------------------------------------------------------
+
+
+I will now provide a logical tutorial for this library.
+I would recommend typing out the examples by hand so that you get a feel for the commands, but you can just copy and paste if you choose. If you copy and paste you will have to delete the first and last character of each line.
+Make sure that you are using layer_template as your template; the examples are just the code that goes in the middle.
+
+If you are already using Gorlock's QB64 Frame Library, you can use this library to have layers hold the frames so that you do not have to redraw them each cycle.
+
+
+Lets create a new layer with NEWLAYER.
+NEWLAYER has four parameters, the width of the layer, the height of the layer, the mother of the layer or the layer handle that this layer will clone the image of without changing the mother layer, and the layer status. For the status parameter, you can have a value of LAYER_HIDE to have a layer not be printed, or LAYER_SHOW to allow a layer to be printed.
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|a = NEWLAYER(SCRX, SCRY, 0, LAYER_SHOW)                                       |
++------------------------------------------------------------------------------+
+
+
+Lets fill it with a color and print it so we can see it.
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|a = NEWLAYER(SCRX, SCRY, 0, LAYER_SHOW)                                       |
+|_DEST LAYER(a)                                                                |
+|PAINT (1, 1), ctorgb(14)                                                      |
+|_DEST 0                                                                       |
+|PRINTLAYER a                                                                  |
+|LAYERFREE a                                                                   |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+This should make the screen yellow. Remember that when you are drawing to a layer, you can not just draw to a%, that is a layer data structure, you must draw to its image handle which can be obtainted by calling LAYER(a%).
+Lets add a second layer now, this on will have a blue circle on it:
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|DIM b AS INTEGER                                                              |
+|a = NEWLAYER(SCRX, SCRY, 0, LAYER_SHOW)                                       |
+|b = NEWLAYER(SCRX, SCRY, 0, LAYER_SHOW)                                       |
+|_DEST LAYER(a)                                                                |
+|PAINT (1, 1), ctorgb(14)                                                      |
+|_DEST 0                                                                       |
+|PRINTLAYER a                                                                  |
+|_DEST LAYER(b)                                                                |
+|CIRCLE (320, 240), 50, ctorgb(0)                                              |
+|PAINT (320, 240), ctorgb(9), ctorgb(0)                                        |
+|_DEST 0                                                                       |
+|PRINTLAYER b                                                                  |
+|LAYERFREE LAYER_ALLLAYERS                                                     |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+We can also print all the layers to the screen at once using LAYER_ALLLAYERS as the handle value.
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|DIM b AS INTEGER                                                              |
+|a = NEWLAYER(SCRX, SCRY, 0, LAYER_SHOW)                                       |
+|b = NEWLAYER(SCRX, SCRY, 0, LAYER_SHOW)                                       |
+|_DEST LAYER(a)                                                                |
+|PAINT (1, 1), ctorgb(14)                                                      |
+|_DEST 0                                                                       |
+|_DEST LAYER(b)                                                                |
+|CIRCLE (320, 240), 50, ctorgb(0)                                              |
+|PAINT (320, 240), ctorgb(9), ctorgb(0)                                        |
+|_DEST 0                                                                       |
+|PRINTLAYER LAYER_ALLLAYERS                                                    |
+|LAYERFREE LAYER_ALLLAYERS                                                     |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+But oh no! Where did our circle go? Lets try the fade command on our yellow layer to see if we can figure it out.
+You can fade a layer using the LAYERFADE subroutine. This subroutine has three parameters: the layer handle, the transparency to fade it to from the layer's current transparency (between 0 and 255), and the time it is going to take to complete the fade. You can pause this fading process using LAYERFADESTOP a% and resume it with LAYERFADESTART a%; layer fades are automatically started when they are created unlike animations.
+You can also directly set a specific transparency value to a layer using LAYERSETTRANSPARENCY, this has two parameters: the layer handle and the transparency value to set it to (between 0 and 255).
+If you change the transparency of the layer, GENERATETRANSLAYER handle% must be executed to create the transparent layer, but using any of the above commands will automatically generate the image for you.
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|DIM b AS INTEGER                                                              |
+|a = NEWLAYER(SCRX, SCRY, 0, LAYER_SHOW)                                       |
+|b = NEWLAYER(SCRX, SCRY, 0, LAYER_SHOW)                                       |
+|_DEST LAYER(a)                                                                |
+|PAINT (1, 1), ctorgb(14)                                                      |
+|_DEST 0                                                                       |
+|_DEST LAYER(b)                                                                |
+|CIRCLE (320, 240), 50, ctorgb(0)                                              |
+|PAINT (320, 240), ctorgb(9), ctorgb(0)                                        |
+|_DEST 0                                                                       |
+|LAYERFADE a, 0, 3                                                             |
+|DO                                                                            |
+|    _LIMIT 16                                                                 |
+|    CLS                                                                       |
+|    PRINTLAYER LAYER_ALLLAYERS                                                |
+|    LOCATE 1                                                                  |
+|    PRINT LAYERTRANSPARENCY(a)                                                |
+|    _DISPLAY                                                                  |
+|LOOP UNTIL LAYERTRANSPARENCY(a) = 0                                           |
+|LAYERFREE LAYER_ALLLAYERS                                                     |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+Ah. There's our circle. Note that we could check the layer's transparency using LAYERTRANSPARENCY(a). But why was the circle printed behind the yellow? When you ask the library to PRINTLAYER LAYER_ALLLAYERS, it prints from the last one created to the first one, this order can be manipulated however. Lets try one of these commands to see how it works:
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|DIM b AS INTEGER                                                              |
+|a = NEWLAYER(SCRX, SCRY, 0, LAYER_SHOW)                                       |
+|b = NEWLAYER(SCRX, SCRY, 0, LAYER_SHOW)                                       |
+|_DEST LAYER(a)                                                                |
+|PAINT (1, 1), ctorgb(14)                                                      |
+|_DEST 0                                                                       |
+|_DEST LAYER(b)                                                                |
+|CIRCLE (320, 240), 50, ctorgb(0)                                              |
+|PAINT (320, 240), ctorgb(9), ctorgb(0)                                        |
+|_DEST 0                                                                       |
+|LAYERBRINGTOFRONT b                                                           |
+|PRINTLAYER LAYER_ALLLAYERS                                                    |
+|PRINT LAYERQUEUE(b)                                                           |
+|LAYERFREE LAYER_ALLLAYERS                                                     |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+We called LAYERBRINGTOFRONT on layer b% to bring it to the front of the printing queue. We can determine a layer's queue value by calling LAYERQUEUE(b%). In this case it returns 2, remember that higher queue numbers are in front, since they are printed later, they cover up other layers rather than getting covered.
+You could have also used LAYERSENDTOBACK a% to achieve the same effect. You can set a layer to a particular queue value using LAYERSETQUEUE, this subroutine has two parameters: the layer handle and its new queue value. The layer that the handle specified and the layer that previously occupied that queue value specified swap places in the printing queue.
+
+You can also use LAYERHIDE and LAYERSHOW to change the status of a layer. Below is an example of how to use these commands, press Space to see the text:
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|DIM b AS INTEGER                                                              |
+|DIM c AS INTEGER                                                              |
+|a = NEWLAYER(SCRX, SCRY, 0, LAYER_SHOW)                                       |
+|b = NEWLAYER(SCRX, SCRY, 0, LAYER_SHOW)                                       |
+|_DEST LAYER(a)                                                                |
+|PAINT (1, 1), ctorgb(14)                                                      |
+|_DEST 0                                                                       |
+|_DEST LAYER(b)                                                                |
+|CIRCLE (320, 240), 50, ctorgb(0)                                              |
+|PAINT (320, 240), ctorgb(9), ctorgb(0)                                        |
+|_DEST 0                                                                       |
+|LAYERBRINGTOFRONT b                                                           |
+|c = NEWLAYER(SCRX, SCRY, 0, LAYER_HIDE)                                       |
+|_DEST LAYER(c)                                                                |
+|_PRINTMODE _KEEPBACKGROUND                                                    |
+|_PRINTSTRING (312, 232), "OK"                                                 |
+|_DEST 0                                                                       |
+|LAYERBRINGTOFRONT c                                                           |
+|DO                                                                            |
+|    _LIMIT 16                                                                 |
+|    CLS                                                                       |
+|    PRINTLAYER LAYER_ALLLAYERS                                                |
+|    IF _KEYDOWN(32) THEN LAYERSHOW c ELSE LAYERHIDE c                         |
+|    _DISPLAY                                                                  |
+|LOOP UNTIL _KEYDOWN(27)                                                       |
+|LAYERFREE LAYER_ALLLAYERS                                                     |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+You can always get the layer status by calling LAYERSTATUS(handle%).
+
+You can create layers that are smaller than the screen size if you need to. It will be faster, but beginners might have trouble keeping track of everything. The below example decreases the size of layer b% and c% to make it faster:
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|DIM b AS INTEGER                                                              |
+|DIM c AS INTEGER                                                              |
+|a = NEWLAYER(SCRX, SCRY, 0, LAYER_SHOW)                                       |
+|b = NEWLAYER(102, 102, 0, LAYER_SHOW)                                         |
+|_DEST LAYER(a)                                                                |
+|PAINT (1, 1), ctorgb(14)                                                      |
+|_DEST 0                                                                       |
+|_DEST LAYER(b)                                                                |
+|CIRCLE (50, 50), 50, ctorgb(0)                                                |
+|PAINT (50, 50), ctorgb(9), ctorgb(0)                                          |
+|_DEST 0                                                                       |
+|LAYERPUT 269, 189, b, 0                                                       |
+|LAYERBRINGTOFRONT b                                                           |
+|c = NEWLAYER(16, 16, 0, LAYER_HIDE)                                           |
+|_DEST LAYER(c)                                                                |
+|_PRINTMODE _KEEPBACKGROUND                                                    |
+|_PRINTSTRING (0, 0), "OK"                                                     |
+|_DEST 0                                                                       |
+|LAYERPUT 312, 232, c, 0                                                       |
+|LAYERBRINGTOFRONT c                                                           |
+|DO                                                                            |
+|    _LIMIT 16                                                                 |
+|    CLS                                                                       |
+|    PRINTLAYER LAYER_ALLLAYERS                                                |
+|    IF _KEYDOWN(32) THEN LAYERSHOW c ELSE LAYERHIDE c                         |
+|    _DISPLAY                                                                  |
+|LOOP UNTIL _KEYDOWN(27)                                                       |
+|LAYERFREE LAYER_ALLLAYERS                                                     |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+By doing this we reduced the size of layer b% to 102x102 and layer c% to 16x16, a remarkable difference. It does require some thought though to get the coordinates correct.
+If you make a layer smaller than the screen, you have to specify where to put it, you can do this by using LAYERPUT. This subroutine has 4 parameters, the new x location, the new y location, the handle of the layer, and the destination image to print it to. Once you set the location with LAYERPUT, you can call LAYERPRINT as many times as you want and the layer will not move unless you tell it to with LAYERPUT. You can recieve the current x coordinate of a layer by calling LAYERX(handle%) and the current y coordinate by calling LAYERY(handle%).
+You can also use this command to change the layer to print onto a destination image other than the screen (0). You can call LAYERDEST(handle%) to get the layer's current destination image handle. If you want to print it just onto another layer however, you can use MERGELAYER. This subroutine has 2 parameters, the layer handle that is being copied, and the layer handle that is being merged onto. This is useful for creating effects.
+
+If for some reason you want to swap the positions of two layers in the actual array, you can use SWAPLAYER. This only has two parameters; the two layer handles that are to be swapped, this will swap the handles too if they are stored in variables.
+
+Finally you can use CLEARLAYER handle% to clear a layer and reset its image to as if it was a newly created layer image. And always be sure to free your layer handles with LAYERFREE!
+
+
+--------------------------------------------------------------------------------
+
+
+I hope you enjoy this library! If you discover an error, think of an idea for a future update, or have a question about the library, please email me at ZGorlock@gmail.com.
+
+
+================================================================================

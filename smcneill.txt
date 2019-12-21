@@ -1,0 +1,142 @@
+REDIM SHARED OOO(100) AS STRING 'Order of Operations, redim to a larger size if you ever create more than 100 operators.
+Set_OrderOfOperations
+
+x$ = "1+SQR((1+2)^2)"
+'x$ = "1 / 0"
+
+PRINT x$
+y$ = Evaluate(x$)
+PRINT x$; " = "; y$
+
+
+SLEEP
+SYSTEM
+
+
+FUNCTION Evaluate$ (e$)
+'First strip all spaces
+FOR i = 1 TO LEN(e$)
+    IF MID$(e$, i, 1) <> " " THEN t$ = t$ + MID$(e$, i, 1)
+NEXT
+'Then make all caps so we can process things easier
+t$ = UCASE$(t$)
+'Deal with brackets first
+exp$ = "(" + t$ + ")" 'Starting and finishing brackets for our parse routine.
+DO
+    e = INSTR(exp$, ")")
+    IF e > 0 THEN
+        c = 0
+        DO UNTIL e - c <= 0
+            c = c + 1
+            IF e THEN
+                IF MID$(exp$, e - c, 1) = "(" THEN EXIT DO
+            END IF
+        LOOP
+        s = e - c + 1
+        IF s < 1 THEN PRINT "ERROR -- BAD () Count": END
+        eval$ = " " + MID$(exp$, s, e - s) + " " 'pad with a space before and after so the parser can pick up the values properly.
+        ParseExpression eval$
+        eval$ = LTRIM$(RTRIM$(eval$))
+        IF LEFT$(eval$, 5) = "ERROR" THEN Evaluate$ = eval$: EXIT SUB
+        exp$ = LEFT$(exp$, s - 2) + eval$ + MID$(exp$, e + 1)
+    END IF
+LOOP UNTIL e = 0
+c = 0
+DO
+    c = c + 1
+    SELECT CASE MID$(exp$, c, 1)
+        CASE "0" TO "9", ".", "-" 'At this point, we should only have number values left.
+        CASE ELSE: exp$ = "ERROR - Unknown Diagnosis"
+    END SELECT
+LOOP UNTIL c >= LEN(exp$)
+
+Evaluate$ = exp$
+END FUNCTION
+
+SUB ParseExpression (exp$)
+DIM num(10) AS STRING
+'We should now have an expression with no () to deal with
+FOR p = 1 TO UBOUND(OOO)
+    IF OOO(p) = "EOO" THEN EXIT FOR
+    DO
+        op = INSTR(exp$, OOO(p))
+        IF op THEN
+            'Get the number after op.   A simple space should be the break for it
+            e = INSTR(op + 1, exp$, " ")
+            c = 0
+            DO
+                c = c + 1
+                SELECT CASE MID$(exp$, op - c, 1)
+                    CASE "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "." 'Valid digit
+                    CASE "-" 'We need to check if it's a minus or a negative
+                        c1 = c
+                        bad = 0
+                        DO
+                            c1 = c1 + 1
+                            SELECT CASE MID$(exp$, op - c1, 1)
+                                CASE "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."
+                                    bad = -1
+                                    EXIT DO 'It's a minus sign
+                                CASE ELSE
+                                    'It's a negative sign and needs to count as part of our numbers
+                            END SELECT
+                        LOOP UNTIL op - c1 <= 0
+                        IF bad THEN EXIT DO 'We found our seperator
+                    CASE ELSE 'Not a valid digit, we found our separator
+                        EXIT DO
+                END SELECT
+            LOOP UNTIL op - c <= 0
+            s = op - c
+            num(1) = MID$(exp$, s + 1, op - s - 1) 'Get our first number
+            num(2) = MID$(exp$, op + LEN(OOO(p)), e - op - LEN(OOO(p)) + 1) 'Get our second number
+            num(3) = EvaluateNumbers(p, num())
+            IF LEFT$(num(3), 5) = "ERROR" THEN exp$ = num(3): EXIT SUB
+            exp$ = LEFT$(exp$, s) + LTRIM$(num(3)) + MID$(exp$, e)
+        END IF
+        op = 0
+    LOOP UNTIL op = 0
+NEXT
+END SUB
+
+
+
+SUB Set_OrderOfOperations
+i = i + 1: OOO(i) = "COS"
+i = i + 1: OOO(i) = "^"
+i = i + 1: OOO(i) = "SQR"
+i = i + 1: OOO(i) = "*"
+i = i + 1: OOO(i) = "/"
+i = i + 1: OOO(i) = "\"
+i = i + 1: OOO(i) = "+"
+i = i + 1: OOO(i) = "-"
+
+
+i = i + 1: OOO(i) = "EOO" 'End of Operators code
+END SUB
+
+FUNCTION EvaluateNumbers$ (p, num() AS STRING)
+DIM n1 AS _FLOAT
+SELECT CASE OOO(p) 'Depending on our operator..
+    CASE "COS"
+        n1 = COS(VAL(num(2)))
+    CASE "^"
+        n1 = VAL(num(1)) ^ VAL(num(2))
+    CASE "SQR"
+        n1 = SQR(VAL(num(2)))
+    CASE "*"
+        n1 = VAL(num(1)) * VAL(num(2))
+    CASE "/":
+        IF VAL(num(2)) = 0 THEN EvaluateNumbers$ = "ERROR - Division by 0": EXIT FUNCTION
+        n1 = VAL(num(1)) / VAL(num(2))
+    CASE "\"
+        IF VAL(num(2)) = 0 THEN EvaluateNumbers$ = "ERROR - Division by 0": EXIT FUNCTION
+        n1 = VAL(num(1)) \ VAL(num(2))
+    CASE "+"
+        n1 = VAL(num(1)) + VAL(num(2))
+    CASE "-"
+        n1 = VAL(num(1)) - VAL(num(2))
+    CASE ELSE
+        EvaluateNumbers$ = "ERROR - Bad operation (We shouldn't see this)"
+END SELECT
+EvaluateNumbers$ = RTRIM$(LTRIM$(STR$(n1)))
+END FUNCTION

@@ -1,0 +1,79 @@
+QB64 Libraries Dropbox Links
+
+/---animation
+|       animation.bi			https://db.tt/NZjp4Y8y
+|       animation_documentation.txt	https://db.tt/GB5001Ji
+|       animation_init.bi		https://db.tt/50u1t8CB
+|       animation_template.bas		https://db.tt/afaZVczK
+|       
++---button
+|       button.bi			https://db.tt/gVghk4b8
+|       button_documentation.txt	https://db.tt/p9wlgztu
+|       button_init.bi			https://db.tt/gt5pIvJ6
+|       button_template.bas		https://db.tt/HdqSExxG
+|	button_resource.rar		https://db.tt/A6M8MXvW
+|       
++---common
+|       common.bi			https://db.tt/k9Tb6QJ4
+|       common_documentation.txt	https://db.tt/4uREMi0e
+|       common_include.txt		https://db.tt/8iRMaXc8
+|       common_init.bi			https://db.tt/sut0WUyg
+|       common_slim.bi			https://db.tt/W47adsIE
+|       common_slim_documentation.txt	https://db.tt/BNlUEi9V
+|       common_slim_init.bi		https://db.tt/mTpTdQCn
+|       common_slim_template.bas	https://db.tt/SJKeLEp6
+|       common_template.bas		https://db.tt/wZcUiKCT
+|       
++---download
+|       download.bi			https://db.tt/65mSYsUY
+|       download_documentation.txt	https://db.tt/mX90HAWO
+|       common_init.bi			https://db.tt/1NUPDJAm
+|       common_template.bas		https://db.tt/O5kiNbp7
+|       
++---frame
+|       frame.bi			https://db.tt/XGX8t9wU
+|       frame_documentation.txt		https://db.tt/G1Zgwh2j
+|       frame_init.bi			https://db.tt/Z20O8fdi
+|       frame_resource.rar		https://db.tt/t7hs0Qli
+|       frame_template.bas		https://db.tt/80JtLWPe
+|       
++---input
+|       input.bi			https://db.tt/DffOJN6z
+|       input_documentation.txt		https://db.tt/jYaN3vRR
+|       input_include.txt		https://db.tt/BXxHAtlA
+|       input_init.bi			https://db.tt/LAUsIW0c
+|       input_template.bas		https://db.tt/R61CRakk
+|	keyboard.txt			https://db.tt/NaeKWert
+|       
++---layer
+|       layer.bi			https://db.tt/MouuHPRe
+|       layer_documentation.txt		https://db.tt/vslFqs8F
+|       layer_init.bi			https://db.tt/JhP7jsXO
+|       layer_template.bas		https://db.tt/aAK3LKpL
+|       
++---textbox
+|       textbox.bi			https://db.tt/bE45zDUW
+|       textbox_documentation.txt	https://db.tt/agVZc8oq
+|       textbox_init.bi			https://db.tt/WTJ8A1NG
+|       textbox_template.bas		https://db.tt/nTRttAmn
+|       
++---time
+|       time.bi				https://db.tt/WiGMLr7m
+|       time_documentation.txt		https://db.tt/2DH9ZSoF
+|       time_include.txt		https://db.tt/dj3KMIgg
+|       time_init.bi			https://db.tt/AdvExyl0
+|       time_template.bas		https://db.tt/BetY0d0c
+|       
+\---[other]
+    +---color32
+    |       color32.BI			https://db.tt/mBFF5MT0
+    |       
+    \---math
+    |       math.bi			https://db.tt/ZiLVqdP5
+    |       math_init.bi		https://db.tt/O7ou9bpW
+    |       
+    \---sprite
+            sprite.bi			https://db.tt/O8HXSCBC
+            sprite_init.bi		https://db.tt/Z0x3pBuW
+            sprite_template.bas		https://db.tt/Q90uEiID
+            

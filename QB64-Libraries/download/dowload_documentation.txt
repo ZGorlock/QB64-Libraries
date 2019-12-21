@@ -1,0 +1,41 @@
+================DOCUMENTATION FOR GORLOCK'S QB64 DOWNLOAD LIBRARY===============
+
+
+This library contains subroutines and functions that allow the programmer to manage downloads. Below the entire functionality and use of this library and its subroutines will be explained.
+
+Include this library into your code as shown in the download_template file found here: https://db.tt/O5kiNbp7. If you have any additional libraries, you will have to logically combine their templates.
+
+
+================================================================================
+
+
+This library defines several useful constants that you can use in your code.
+
+When you get the status of a download using DownloadStatus, you will recieve one of the following values:
+
++--------------------------------------------+
+|========CONST========|====STATUS====|=VALUE=|
++---------------------+--------------+-------+
+| DOWNLOAD_FINISHED   |  Finished    |  -1   |
+| DOWNLOAD_FAILED     |  Failed      |   0   |
+| DOWNLOAD_INPROGRESS |  In Progress |   1   |
+| DOWNLOAD_PAUSED     |  Paused      |   2   |
++--------------------------------------------+
+
+
+
+--------------------------------------------------------------------------------
+
+
+I will now provide a logical tutorial for this library.
+I would recommend typing out the examples by hand so that you get a feel for the commands, but you can just copy and paste if you choose. If you copy and paste you will have to delete the first and last character of each line.
+Make sure that you are using download_template as your template; the examples are just the code that goes in the middle.
+
+
+--------------------------------------------------------------------------------
+
+
+I hope you enjoy this library! If you discover an error, think of an idea for a future update, or have a question about the library, please email me at ZGorlock@gmail.com.
+
+
+================================================================================

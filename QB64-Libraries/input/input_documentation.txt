@@ -1,0 +1,509 @@
+================DOCUMENTATION FOR GORLOCK'S QB64 INPUT LIBRARY==================
+
+
+This library contains functions and subroutines aimed at providing the programmer with easy access to user mouse and keyboard input. Below the entire functionality and use of this library and its functions and subroutines will be explained.
+
+This library has code that must be manually copied into your code body. This code can be found in the input_include file found here: https://db.tt/BXxHAtlA.
+Include this library into your code as shown in the input_template file found here: https://db.tt/R61CRakk. Note that if you have additional libraries that use the input library, use their template instead. If you have any additional libraries, you will have to logically combine their templates.
+Note that if you have any other declared library functions or subroutines, you MUST combine them! If you have multiple declarations of the same library, even with different functions, you will have a C++ compiler error.
+
+
+================================================================================
+
+
+I will now provide a logical tutorial for this library.
+I would recommend typing out the examples by hand so that you get a feel for the commands, but you can just copy and paste if you choose. If you copy and paste you will have to delete the first and last character of each line.
+Make sure that you are using input_template as your template; the examples are just the code that goes in the middle.
+
+This library can collect two different types of keyboard input: assynchronously, and via the keyboard buffer. If you use INKEY$, you are used to using keyboard input through a buffer; this only allows for one key to be detected at a time. Assynchronous input, on the other hand does not use a buffer and instead queries the system for a particular key directly. This could be compared to using _KEYDOWN(). This library can also collect input from the mouse. The functions below will give you a detailed look into the usage of this library.
+
+
+The simplest function in this library is K$. This function returns the value of INKEY$ at the last call of GETINPUT. Note that if you never call GETINPUT, the value will never change. See the code below for an example:
+
+
++------------------------------------------------------------------------------+
+|DO                                                                            |
+|    _LIMIT 16                                                                 |
+|    CLS                                                                       |
+|    GETINPUT                                                                  |
+|    PRINT K                                                                   |
+|LOOP UNTIL K = CHR$(27)                                                       |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+This code shows you how to get basic input from the library and the importance of GETINPUT called regularly in a loop or, alternatively, before each call of K. But at that point you are better off just using INKEY$. Try removing GETINPUT and running the code.
+The GETINPUT subroutine does more than just update K, it also updates the value Keyd which contains the ASCII value of K, this value is used in some functions. It also calls GETMOUSEINPUT which updates the MInput structure that can be used to find out information about the mouse input.
+
+K is equivalent to using INKEY$ so it will only work when your program is the foreground window.
+
+
+--------------------------------------------------------------------------------
+
+
+In our last example, we waited until the user presses the Escape key to end the program. Try running this new example:
+
+
++------------------------------------------------------------------------------+
+|DO                                                                            |
+|    _LIMIT 16                                                                 |
+|    CLS                                                                       |
+|    GETINPUT                                                                  |
+|    PRINT K                                                                   |
+|LOOP UNTIL ESC                                                                |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+We were able to query the Escape key by using a boolean function, how convienient! In fact we could even remove the GETINPUT in this example because all boolean single-key functions are assynchronous, more on this later.
+
+
++------------------------------------------------------------------------------+
+|DO                                                                            |
+|LOOP UNTIL ESC                                                                |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+There are a number of keys that we can query in this manner. These functions have no parameters and are meant to be used as boolean statement where a value of TRUE would indicate that the key is being pressed and FALSE indicating the key is idle. The complete list of keys available are listed below along with their three character function name:
+
+
++------------------------------+
+|=FUNCTION=|========KEY========|
++----------+-------------------|
+|   ALT    |  Alt              |
+|   APK    |  Application      |
+|   BSP    |  Backspace        |
+|   CLK    |  Caps Lock        |
+|   CLR    |  Clear            |
+|   CTR    |  Ctrl             |
+|   DLK    |  Delete           |
+|   EDK    |  End              |
+|   ESC    |  Escape           |
+|   EXK    |  Execute          |
+|   HLK    |  Help             |
+|   HME    |  Home             |
+|   INS    |  Insert           |
+|   NLK    |  Num Lock         |
+|   NTK    |  Next Track       |
+|   PAK    |  Pause            |
+|   PDN    |  Page Down        |
+|   PPK    |  Play/Pause       |
+|   PRK    |  Print            |
+|   PSK    |  Print Screen     |
+|   PTK    |  Previous Track   |
+|   PUP    |  Page Up          |
+|   RTN    |  Return           |
+|   SBK    |  Start Browser    |
+|   SFT    |  Shift            |
+|   SLE    |  Sleep            |
+|   SLK    |  Scroll Lock      |
+|   SMK    |  Start Mail       |
+|   SPK    |  Stop             |
+|   STK    |  Select           |
+|   TBK    |  Tab              |
+|   VDK    |  Volume Down      |
+|   VMK    |  Volume Mute      |
+|   VUK    |  Volume Up        |
+|   WNK    |  Windows          |
+|   ZMK    |  Zoom             |
++------------------------------+
+
+
+You may not neccesarily have need of all of the functions listed above, below I have seperated the keys into categories to make them easier to read:
+
+
++------------------------------+
+|         CONTROL KEYS         |
++------------------------------+
+|=FUNCTION=|========KEY========|
++----------+-------------------|
+|   ALT    |  Alt              |
+|   BSP    |  Backspace        |
+|   CTR    |  Ctrl             |
+|   ESC    |  Escape           |
+|   RTN    |  Return           |
+|   SFT    |  Shift            |
+|   TBK    |  Tab              |
++------------------------------+
+
++------------------------------+
+|           PAD KEYS           |
++------------------------------+
+|=FUNCTION=|========KEY========|
++----------+-------------------|
+|   DLK    |  Delete           |
+|   EDK    |  End              |
+|   HME    |  Home             |
+|   INS    |  Insert           |
+|   PDN    |  Page Down        |
+|   PUP    |  Page Up          |
++------------------------------+
+
++------------------------------+
+|          LOCK KEYS           |
++------------------------------+
+|=FUNCTION=|========KEY========|
++----------+-------------------|
+|   CLK    |  Caps Lock        |
+|   NLK    |  Num Lock         |
+|   SLK    |  Scroll Lock      |
++------------------------------+
+
++------------------------------+
+|        MICROSOFT KEYS        |
++------------------------------+
+|=FUNCTION=|========KEY========|
++----------+-------------------|
+|   APK    |  Application      |
+|   CLR    |  Clear            |
+|   EXK    |  Execute          |
+|   HLK    |  Help             |
+|   PRK    |  Print            |
+|   PSK    |  Print Screen     |
+|   SBK    |  Start Browser    |
+|   SLE    |  Sleep            |
+|   SMK    |  Start Mail       |
+|   STK    |  Select           |
+|   WNK    |  Windows          |
+|   ZMK    |  Zoom             |
++------------------------------+
+
++------------------------------+
+|          MEDIA KEYS          |
++------------------------------+
+|=FUNCTION=|========KEY========|
++----------+-------------------|
+|   NTK    |  Next Track       |
+|   PAK    |  Pause            |
+|   PPK    |  Play/Pause       |
+|   PTK    |  Previous Trac    |
+|   SPK    |  Stop             |
+|   VDK    |  Volume Down      |
+|   VMK    |  Volume Mute      |
+|   VUK    |  Volume Up        |
++------------------------------+
+
+
+Remember that all of these queries are assynchronous meaning that multiple keys can be detected simulateously and they will be detected even if your program is not the foreground window! This can be important in writing the UI systems of some programs. If it is important to ensure that your program is active while recieving the input you can use the Isfg function from the Common Library. For example, "If ESC AND Isfg THEN SYSTEM" would terminate the program if the user has the escape key held but only if the program is the foreground window.
+Also remember that the keys in these functions are queried at the time of the call, no buffer is used as with K.
+
+
+--------------------------------------------------------------------------------
+
+
+The key functions use KEYX to obtain whether the key is active or not. This function requires one parameter, the virtual key code of the key you are querying. This function uses GetAsyncKeyState from the MSDN, a list of virtual key codes are available here: http://msdn.microsoft.com/en-us/library/windows/desktop/dd375731(v=vs.85).aspx
+Remember that the values listed on the page are in hexidecimal.
+
+
++------------------------------------------------------------------------------+
+|DO                                                                            |
+|LOOP UNTIL KEYX(&H5A)                                                         |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+This example will terminate when the user presses the Z key. Using this function you have the freedom to use whichever key you need rather than one of the 36 provided to you in the functions above.
+
+
+--------------------------------------------------------------------------------
+
+
+There are also 10 functions used for returning specific combinations of different keys. Remember that you can query any combination of keys you wish using KEYX, these are only common pairs of keys. These functions are not necessarily assynchronous; for assynchronous combinations use KEYX. A description of each function is provided below:
+
+AKEY   - Alt Key + letter
+CKEY   - Ctrl Key + letter
+DKEY   - Direction Keys
+FKEY   - A Function Key
+FKEY_A - Alt Key + a Function Key
+FKEY_C - Ctrl Key + a Function Key
+FKEY_S - Shift Key + a Function Key
+LKEY   - Detailed query of a Lock Key
+NUM_A  - Alt Key + number
+PAD_C  - Ctrl Key + Keypad
+
+
+AKEY can be used to determine if a letter key is being pressed along with the Alt Key.
+   The acceptable input values are between 1 and 26. You can also use the
+   constant values AKEY_A to AKEY_Z.
+
+   +--------------------------------------+
+   |DO                                    |
+   |    _LIMIT 16                         |
+   |    GETINPUT                          |
+   |LOOP UNTIL AKEY(AKEY_P)               |
+   |END                                   |
+   +--------------------------------------+
+
+   This example will terminate when the user hits the Alt Key and the P Key
+   together.
+
+CKEY can be used to determine if a letter key is being pressed along with the Ctrl Key.
+   The acceptable input values are between 1 and 26. You can also use the
+   constant values CKEY_A to CKEY_Z.
+   This function is identical in usage to AKEY.
+
+DKEY can be used to determine the state of the directional arrow keys.
+   The acceptable input values are between 1 and 4. You can also use the
+   constant values DKEY_UP to DKEY_DOWN. The meanings of the input values are
+   shown below:
+      1  -  DKEY_UP     -  The up arrow key
+      2  -  DKEY_LEFT   -  The left arrow key
+      3  -  DKEY_RIGHT  -  The right arrow key
+      4  -  DKEY_DOWN   -  The down arrow key
+
+   +--------------------------------------+
+   |DO                                    |
+   |    _LIMIT 16                         |
+   |    CLS                               |
+   |    IF DKEY(DKEY_UP) THEN PRINT "U"   |
+   |    IF DKEY(DKEY_LEFT) THEN PRINT "L" |
+   |    IF DKEY(DKEY_RIGHT) THEN PRINT "R"|
+   |    IF DKEY(DKEY_DOWN) THEN PRINT "D" |
+   |LOOP UNTIL ESC                        |
+   |END                                   |
+   +--------------------------------------+
+
+   This example shows the usage of the DKEY function.
+   Note that DKEY queries are assynchronous! So you can get directions like
+   diagonals for games.
+
+FKEY can query the Function Keys.
+   The acceptable input values are between 1 and 12. You can also use the
+   constant values F1 to F12.
+
+   +--------------------------------------+
+   |DO                                    |
+   |    _LIMIT 16                         |
+   |    GETINPUT                          |
+   |LOOP UNTIL FKEY(F4)                   |
+   |END                                   |
+   +--------------------------------------+
+
+   This example terminates when the user presses the F4 key.
+
+FKEY_A can be used to determine is a Function Key is being pressed along with the Alt Key.
+   The acceptable input values are between 1 and 12. You can also use the
+   constant values F1 to F12.
+   This function is identical in usage to FKEY.
+   
+FKEY_C can be used to determine is a Function Key is being pressed along with the Alt Key.
+   The acceptable input values are between 1 and 12. You can also use the
+   constant values F1 to F12.
+   This function is identical in usage to FKEY.
+
+FKEY_S can be used to determine is a Function Key is being pressed along with the Alt Key.
+   The acceptable input values are between 1 and 12. You can also use the
+   constant values F1 to F12.
+   This function is identical in usage to FKEY.
+
+LKEY is a bit different then the other functions in this group; it returns a detailed query value of one of the three Lock Keys.
+   The acceptable input values are between 1 and 3. You can also use the
+   constant values LKEY_CAPS to LKEY_SCROLL. The meanings of the input values
+   are shown below:
+      1  -  LKEY_CAPS    -  The Caps Lock Key
+      2  -  LKEY_NUM     -  The Num Lock Key
+      3  -  LKEY_SCROLL  -  The Scroll Lock Key
+   When the function is called it returns one of the following values:
+     -128  -  Was active, now held
+     -127  -  Was idle, now held
+      0    -  Idle
+      1    -  Active
+
+   +--------------------------------------+
+   |DO                                    |
+   |    _LIMIT 16                         |
+   |    GETINPUT                          |
+   |    PRINT LKEY(LKEY_CAPS)             |
+   |LOOP UNTIL ESC                        |
+   |END                                   |
+   +--------------------------------------+
+
+   Run the example above and press and hold the Caps Lock Key to get a feel for
+   the meaning of the return values.
+   Note this function calls GetKeyState and therefore could be used
+   assynchronously.
+
+NUM_A can be used to determine if a number key is being pressed while the Alt Key is being held.
+   The acceptable input values are between 0 and 9.
+
+PAD_C can be used to determine if a keypad key is being pressed while the Ctrl Key is being held.
+   The acceptable input value are between 1 and 6.
+
+
+--------------------------------------------------------------------------------
+
+
+You can also recieve additional information specific to something you might need. The function CHAR will return the ASCII character value of the key press if any. Not this will only return a value if the ASCII character is between 32 and 126. You can also use NUM to return the number key that is being pressed, if any. The default return value is -1 so test it to make sure it is greater than -1 before using it. The return values for this are 0 to 9.
+
+
+There are several keys to return if there is currently input on the screen. These commands are ISINPUT, KEYBOARDINPUT, and OSC.
+
+ISINPUT tests whether there is input or not on the screen. It checks for mouse clicks, mouse movement, and key hits with the program as the foreground window. The possible return values are TRUE if there is an input, or FALSE if there is not. This is a faster way to check if there is input on the program window when it is the foreground window than the Isfg function of Gorlock's QB64 Common Library, however this should not be used to check for things like changes to K or Keyd, no error will occur if you call any function when there is no input, only use it when necessary,
+
+KEYBOARDINPUT tests if there is keyboard input. It checks only for key hits if the program is the foreground window. This function will return TRUE if there is a key hit or FALSE if there is not.
+
+OSC tests for an on screen click, this can be anywhere on the screen, not necessarily on the program window. If the left, right, or middle mouse button is pressed when it is called, it will return TRUE, otherwise it will return FALSE. This function is assynchronous.
+
+
+--------------------------------------------------------------------------------
+
+
+You can also querry the mouse for input like the keyboard. Where keyboard updates with GETINPUT, the mouse updates with GETMOUSEINPUT. Naturally, GETINPUT calls GETMOUSEINPUT on its own, but if you are only looking for mouse input and not keyboard input then you can just use GATMOUSEINPUT rather than GETINPUT for speed.
+
+Once you have updated you mouse input data structure, you can retieve the data with a number of functions, I will describe each briefly below:
+
+CLICK         -  Returns TRUE if any button on the mouse is pressed, otherwise
+                 FALSE
+CLICKOLD      -  Returns TRUE if the last loop CLICK would have returned TRUE.
+CLICKCHANGE   -  Returns TRUE if the value of CLICK has changed between the
+                 previous call and this call, useful for detecting when clicks
+                 are hit and let go.
+
+LCLICK        -  Returns TRUE if the left mouse button is pressed, otherwise
+                 FALSE.
+LCLICKOLD     -  Returns TRUE if the last loop LCLICK would have returned TRUE.
+LCLICKCHANGE  -  Returns TRUE if the value of LCLICK has changed between the
+                 previous call and this call, useful for detecting when clicks
+                 are hit and let go.
+
+RCLICK        -  Returns TRUE if the right mouse button is pressed, otherwise
+                 FALSE.
+RCLICKOLD     -  Returns TRUE if the last loop RCLICK would have returned TRUE.
+RCLICKCHANGE  -  Returns TRUE if the value of RCLICK has changed between the
+                 previous call and this call, useful for detecting when clicks
+                 are hit and let go.
+
+MCLICK        -  Returns TRUE if the middle mouse button is pressed, otherwise
+                 FALSE.
+MCLICKOLD     -  Returns TRUE if the last loop MCLICK would have returned TRUE.
+MCLICKCHANGE  -  Returns TRUE if the value of MCLICK has changed between the
+                 previous call and this call, useful for detecting when clicks
+                 are hit and let go.
+
+
+MOUSEX        -  Returns the current x coordinate of the mouse cursor on the
+                 program window
+MOUSEY        -  Returns the current y coordinate of the mouse cursor on the
+                 program window
+
+MOUSESCREENX  -  Returns the current x coordinate of the mouse cursor on the
+                 screen
+MOUSESCREENY  -  Returns the current y coordinate of the mouse cursor on the
+                 screen
+
+MOUSEWHEEL    -  Returns the value of the scroller. This value is already
+                 multiplied by ScrollMultiplier, this is 1 by default, but you
+                 can change it in your code. It will move that many lines every
+                 click of the mouse wheel.
+
+MOVEMOUSE     -  Returns TRUE if the mouse cursor has changed positions since
+                 the last call.
+
+
+--------------------------------------------------------------------------------
+
+
+Finally, there are two commands that allow you to find the time between inputs.
+
+LASTGETINPUT will return the TIMER value of the last time you called GETINPUT. You can use this to see how long something has been held or to time out things.
+LASTINPUT will return the tick time of the last input according to the system. You can use this in a similar way to LASTGETINPUT just assynchronously. You can retrienve more data about the last input through LastInputData structure.
+
+
+--------------------------------------------------------------------------------
+
+
+Inside this library there is included a mini library for creating and monitoring on-screen keyboards. Here I will provide a tutorial for using this library.
+
+First lets load a keyboard layout from a file. I will show you how to make a layout later but for now lets just use the default one which you can find here: https://db.tt/NaeKWert
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|a = KEYBOARDNEW("keyboard.txt", KEYBOARD_DEFAULTKEYWIDTH, KEYBOARD_SHOW)      |
++------------------------------------------------------------------------------+
+
+
+We load a keyboard layout we use KEYBOARDNEW. This has three parameters: the string of the filename of the layout file, the width of each key in pixels, and the visibility status of the keyboard. You can use KEYBOARD_DEFAULTKEYWIDTH for the value of the width of the keys, the default width is 32 pixels.
+You can always change the visibility status of the keyboard using KEYBOARDHIDE and KEYBOARDSHOW. You can obtain the current status of a keyboard using KEYBOARDSTATUS.
+
+Once we have loaded a layout, we need to put it somewhere, unless we want it to be at (0, 0). To do this we use PUTKEYBOARD:
+
+
++------------------------------------------------------------------------------+
+|PUTKEYBOARD 100, 100, a, 0                                                    |
++------------------------------------------------------------------------------+
+
+
+This moves the keyboard to (100, 100) on destination image 0. Now, every time we draw the keyboard, it will be drawn at this location.
+
+You can use KEYBOARDHIT to read a hit from a keyboard. It will return 0 by default and the value of the ascii of the key you clicked if you hit a key.
+
+DRAWKEYBOARD will draw the keyboard to the screen or destination image set by PUTKEYBOARD.
+Now lets put it all together:
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|a = KEYBOARDNEW("keyboard.txt", KEYBOARD_DEFAULTKEYWIDTH, KEYBOARD_SHOW)      |
+|PUTKEYBOARD 100, 100, a, 0                                                    |
+|                                                                              |
+|DO                                                                            |
+|    _LIMIT 32                                                                 |
+|    CLS                                                                       |
+|    COLOR ctorgb(TEXTCOLOR_DEFAULT)                                           |
+|    PRINT n$                                                                  |
+|    GETINPUT                                                                  |
+|    DRAWKEYBOARD a                                                            |
+|    _DISPLAY                                                                  |
+|    n = KEYBOARDHIT(a)                                                        |
+|    SELECT CASE n                                                             |
+|        CASE 0                                                                |
+|        CASE 8                                                                |
+|            n$ = LEFT$(n$, LEN(n$) - 1)                                       |
+|        CASE 13                                                               |
+|            EXIT DO                                                           |
+|        CASE ELSE                                                             |
+|            n$ = n$ + CHR$(n)                                                 |
+|    END SELECT                                                                |
+|    n$ = n$ + K                                                               |
+|LOOP UNTIL ESC                                                                |
+|CLS                                                                           |
+|PRINT n$                                                                      |
+|_DISPLAY                                                                      |
+|KEYBOARDFREE a                                                                |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+Always be sure to free your keyboard handles with KEYBOARDFREE once you are done using them.
+
+If we want to, we can change the colors of the keyboard with KEYBOARDSETCOLOR. This has several parameters: handle%, frame~&, l~&, f~&, lh~&, fh~&, la~&, and fa~&. handle% is the handle of a keyboard, to change the colors of all keyboards send KEYBOARD_ALLKEYBOARDS as handle%. frame~&, l~&, f~&, lh~&, fh~&, la~&, and fa~& are the 32bit color values of the framecolor, lettercolor, fillcolor, lettercolor_hover, fillcolor_hover, lettercolor_active, and fillcolor_active elements of a KEYBOARD structure respectively. If you send 0 for any of these parameters it will remain unchanged. The default values for these elements are KEYBOARD_DEFAULTCOLOR_FRAME, KEYBOARD_DEFAULTCOLOR_LETTER, KEYBOARD_DEFAULTCOLOR_FILL, KEYBOARD_DEFAULTCOLOR_LETTER_HOVER, KEYBOARD_DEFAULTCOLOR_FILL_HOVER, KEYBOARD_DEFAULTCOLOR_LETTER_ACTIVE, and KEYBOARD_DEFAULTCOLOR_FILL_ACTIVE respectively.
+Try adding this line after the PUTKEYBOARD line:
+
+
++------------------------------------------------------------------------------+
+|KEYBOARDSETCOLOR a, _RGB32(205, 74, 76), _RGB32(165, 105, 79), _              |
+|  _RGB32(75, 0, 130), _RGB32(240, 128, 128), _RGB32(176, 196, 222), _         |
+|  _RGB32(255, 207, 72), _RGB32(0, 128, 128)                                   |
++------------------------------------------------------------------------------+
+
+
+--------------------------------------------------------------------------------
+
+
+There may come a time where you want to create your own custom keyboard instead of using the default one. Your custom keyboard can have up to 127 rows and 127 colums of buttons (not recommended).
+
+When you create the file, each key is defined by 3 numbers, these three numbers are the ascii value of the key, 256 can be used for Shift and 257 for Caps Lock, any other special keys will need to be individually added to the library or manually accounted for. A empty key, 000, will just act as a placeholder and will not interact with the mouse. Make sure that each row has the same amount of keys. There should be no spaces in the line. If you want a key to take up more than just the default key width, you can put the same ascii value side by side to create a larger button (this does not work vertically).
+After you have constructed your keyboard layout, copy and paste it immediately after itself. This second set will act as the board when Shift is pressed or Caps Lock is on. If you are not using Shift or Caps Lock then you can just leave this exactly the same as the first one, or if you are you can make adjustments accordinly.
+
+Look at the default layout file if you are having trouble.
+
+
+--------------------------------------------------------------------------------
+
+
+I hope you enjoy this library! If you discover an error, think of an idea for a future update, or have a question about the library, please email me at ZGorlock@gmail.com.
+
+
+================================================================================

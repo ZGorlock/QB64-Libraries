@@ -1,0 +1,2 @@
+box row limit is 127
+freetextbox does not free linked tick sounds

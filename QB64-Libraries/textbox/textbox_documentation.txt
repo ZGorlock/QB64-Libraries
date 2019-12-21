@@ -1,0 +1,624 @@
+================DOCUMENTATION FOR GORLOCK'S QB64 TEXTBOX LIBRARY================
+
+
+This library contains subroutines and functions that allow the programmer to create and manage textboxes. Below the entire functionality and use of this library and its subroutines will be explained.
+
+Include this library into your code as shown in the textbox_template file found here: https://db.tt/nTRttAmn. If you have any additional libraries, you will have to logically combine their templates.
+
+The maximum number of rows in a textbox is 127!
+If you link a sound with text ticking, freeing the textbox does not free the sound!
+
+
+================================================================================
+
+
+This library defines several useful constants that you can use in your code.
+
+
+                     Defaults and Metric Constants
++----------------------------------------------------------------------+
+|===============CONST===============|===============VALUE==============|
++-----------------------------------+----------------------------------+
+|TEXTBOX_DEFAULTFONT                |                16                |
+|TEXTBOX_DEFAULTCOLOR               |           &HFFFFFFFF~&           |
+|TEXTBOX_SCROLLBAR_MINSIZE          |                15                |
+|TEXTBOX_IMAGE_DEFAULTBORDER        |                4                 |
+|TEXTBOX_IMAGE_MINIMUMBORDER        |                2                 |
+|TEXTBOX_LINK_STAND                 |           &HFF00FF00~&           |
+|TEXTBOX_LINK_HOVER                 |           &HFF0000FF~&           |
+|TEXTBOX_LINK_ACTIVE                |           &HFF800080~&           |
++----------------------------------------------------------------------+
+
+
+
+There are a good number of constants that you can use for the different properties of a textbox. You can use these in NEWTEXTBOX or they might be returned as a status value:
+
+                          Box Status Constants
++----------------------------------------------------------------------+
+|================CONST================|=========STATUS=========|=VALUE=|
++-------------------------------------+------------------------+-------+
+| TEXTBOX_SHOW                        |  Show                  | -1    |
+| TEXTBOX_HIDE                        |  Hide                  |  0    |
++----------------------------------------------------------------------+
+
+                           Box Type Constants
++----------------------------------------------------------------------+
+|================CONST================|==========TYPE==========|=VALUE=|
++-------------------------------------+------------------------+-------+
+| TEXTBOX_TITLE                       |  Title                 |  0    |
+| TEXTBOX_TEXT_STATIC                 |  Static                |  1    |
+| TEXTBOX_TEXT_DYNAMIC                |  Dynamic               |  2    |
+| TEXTBOX_TEXT_REVERSE                |  Reverse               |  3    |
+| TEXTBOX_TEXT_REVERSE_STRICT         |  Strict Reverse        |  4    |
++----------------------------------------------------------------------+
+
+                          Input Type Constants
++----------------------------------------------------------------------+
+|================CONST================|==========TYPE==========|=VALUE=|
++-------------------------------------+------------------------+-------+
+| TEXTBOX_INPUT_DIRECT                |  Direct                |  1    |
+| TEXTBOX_INPUT_INDIRECT              |  Indirect              |  2    |
+| TEXTBOX_INPUT_ANY                   |  Any                   |  3    |
++----------------------------------------------------------------------+
+
+                       Scrollbar Theme Constants
++----------------------------------------------------------------------+
+|================CONST================|=========THEME==========|=VALUE=|
++-------------------------------------+------------------------+-------+
+| TEXTBOX_SCROLLBAR_ON                |  On                    | TRUE  |
+| TEXTBOX_SCROLLBAR_OFF               |  Off                   | FALSE |
+| TEXTBOX_SCROLLBAR_BOX_DEFAULT       |  Box                   |  1    |
+| TEXTBOX_SCROLLBAR_BOX_HOLLOW        |  Box (Hollow)          |  2    |
+| TEXTBOX_SCROLLBAR_BOX_HOLLOW_NOLINE |  Box (Hollow, No Line) |  3    |
+| TEXTBOX_SCROLLBAR_BALL_DEFAULT      |  Ball                  |  4    |
+| TEXTBOX_SCROLLBAR_BALL_HOLLOW       |  Ball (Hollow)         |  5    |
+| TEXTBOX_SCROLLBAR_DOT               |  Dot                   |  6    |
++----------------------------------------------------------------------+
+
+                       Other NEWTEXTBOX Constants
++----------------------------------------------------------------------+
+|================CONST================|=========STATUS=========|=VALUE=|
++-------------------------------------+------------------------+-------+
+| TEXTBOX_LINK_ON                     |  Links on              | TRUE  |
+| TEXTBOX_LINK_OFF                    |  Links off             | FALSE |
+| TEXTBOX_NOFRAME                     |  No Frame              | FALSE |
+| TEXTBOX_NOBACKGROUND                |  No Background         | FALSE |
+| TEXTBOX_NOFRAME                     |  No Frame              | FALSE |
++----------------------------------------------------------------------+
+
+
+
+There are also constants to customize your links, scrollbars, and backgrounds:
+
+                             Link Constants
++----------------------------------------------------------------------+
+|================CONST================|=========STATUS=========|=VALUE=|
++-------------------------------------+------------------------+-------+
+| TEXTBOX_LINK_UNDERLINE_ON           |  Underline On          | TRUE  |
+| TEXTBOX_LINK_UNDERLINE_OFF          |  Underline Off         | FALSE |
+|                                     |                        |       |
+| TEXTBOX_LINKSTATUS_STAND            |  Stand                 |  1    |
+| TEXTBOX_LINKSTATUS_HOVER            |  Hover                 |  2    |
+| TEXTBOX_LINKSTATUS_ACTIVE           |  Active                |  3    |
++----------------------------------------------------------------------+
+
+                           Scrollbar Constants
++----------------------------------------------------------------------+
+|================CONST================|=========STATUS=========|=VALUE=|
++-------------------------------------+------------------------+-------+
+| TEXTBOX_SCROLLBAR_BOX               |  Box On                | TRUE  |
+| TEXTBOX_SCROLLBAR_NOBOX             |  Box Off               | FALSE |
+|                                     |                        |       |
+| TEXTBOX_SCROLLBAR_LINE              |  Line On               | TRUE  |
+| TEXTBOX_SCROLLBAR_NOLINE            |  Line Off              | FALSE |
++----------------------------------------------------------------------+
+
+                           Background Constants
++----------------------------------------------------------------------+
+|================CONST================|=========STATUS=========|=VALUE=|
++-------------------------------------+------------------------+-------+
+| TEXTBOX_BACKGROUND_STRETCH          |  Stretch               |  1    |
+| TEXTBOX_BACKGROUND_FIT              |  Fit                   |  2    |
+| TEXTBOX_BACKGROUND_CENTER           |  Center                |  3    |
++----------------------------------------------------------------------+
+
+
+
+When you are adding images to your textbox, you can use the follorwing constants:
+
+                             Image Constants
++----------------------------------------------------------------------+
+|================CONST================|=========STATUS=========|=VALUE=|
++-------------------------------------+------------------------+-------+
+| TEXTBOX_IMAGE_NOBORDER              |  No Border             | FALSE |
+|                                     |                        |       |
+| TEXTBOX_IMAGE_BLOCK                 |  Block                 |  0    |
+| TEXTBOX_IMAGE_SURROUND              |  Surround              |  1    |
+| TEXTBOX_IMAGE_WRAP                  |  Wrap                  |  2    |
+|                                     |                        |       |
+| TEXTBOX_IMAGE_NEXTROW               |  Next Row              |  1    |
+| TEXTBOX_TEXTBOXIMAGE                |  Textbox Image         |  1    |
++----------------------------------------------------------------------+
+
+
+
+                             Other Constants
++----------------------------------------------------------------------+
+|================CONST================|=========STATUS=========|=VALUE=|
++-------------------------------------+------------------------+-------+
+| TEXTBOX_CONTENT_TEXT                |  Text                  |  1    |
+| TEXTBOX_CONTENT_IMAGE               |  Image                 |  2    |
+| TEXTBOX_CONTENT_TEXTBOX             |  Textbox               |  3    |
+|                                     |                        |       |
+| TEXTBOX_TICK                        |  Tick On               | TRUE  |
+| TEXTBOX_NOTICK                      |  Tick Off              | FALSE |
+|                                     |                        |       |
+| TEXTBOX_KEEPCOLOR                   |  Keep Color            |  1    |
++----------------------------------------------------------------------+
+
+
+You can use TEXTBOX_ALLTEXTBOXES as a handle to preform an action to all your textboxes at once.
+
+
+--------------------------------------------------------------------------------
+
+
+I will now provide a logical tutorial for this library.
+I would recommend typing out the examples by hand so that you get a feel for the commands, but you can just copy and paste if you choose. If you copy and paste you will have to delete the first and last character of each line.
+Make sure that you are using textbox_template as your template; the examples are just the code that goes in the middle.
+
+
+
+                          ---BUILDING YOUR TEXTBOX---
+
+Lets start by building a simple textbox. To make a new textbox use the NEWTEXTBOX function. This has 14 parameters so I will go over each individually:
+
+The first four parameters are all LONG. They are left, top, right, and bottom. These parameters represent the rectangular area of the textbox you are creating. The parameters stand for the x coordinate of the upper left corner of the textbox, the y coordinate of the upper left corner of the textbox, the x coordinate of the lower right corner of the textbox, and the y coordinate of the lower right corner of the textbox, respectively.
+The fifth parameter is the status of the textbox. This can have two possible values, TEXTBOX_SHOW or TEXTBOX_HIDE. If TEXTBOX_SHOW is used, the textbox will be drawn to the screen or its destination image. If TEXTBOX_HIDE is chosen, the textbox will initially be hidden from the screen. This status can always be changed later with the SHOWTEXTBOX and HIDETEXTBOX subroutines.
+The sixth parameter is the box type of the textbox. This value dictates how the textbox will behave when text is added. For this parameter there are 5 possible values. These can be a little confusing so play around with them when you get to adding text and you will understand them a little better. The 5 parameter values are:
+   TEXTBOX_TITLE should only be chosen when the textbox you are creating will only have one row and one line of text. This value will center the text in the textbox like a title.
+   TEXTBOX_TEXT_STATIC is the basic default textbox behaviour. As text is added, the number of textlines increases but you must scroll down to see the new text.
+   TEXTBOX_TEXT_DYNAMIC is like TEXTBOX_TEXT_STATIC except that everytime a new line is added, the screen moves down that many rows.
+   TEXTBOX_TEXT_REVERSE is similar to TEXTBOX_TEXT_STATIC except that text is added from the bottom of the textbox and scrolls up.
+   TEXTBOX_TEXT_REVERSE_STRICT is similar to TEXTBOX_TEXT_REVERSE in that text is added from the bottom of the textbox, except everytime a new line is added, the textbox screen is forced to the bottom row.
+The seventh parameter is the input type. This defines how the textbox will look for and accept input from the user. There are 3 possible values for this parameter:
+   TEXTBOX_INPUT_DIRECT tells the textbox only to accept input from the user when the cursor is directly over the textbox.
+   TEXTBOX_INPUT_INDIRECT tells the textbox only to accept input from the user when the cursor is not directly over the textbox.
+   TEXTBOX_INPUT_ANY tells the textbox to accept all input. No matter where the mouse is relative to the textbox, the textbox will assume user input is intended for it.
+The eigth parameter is the destination image that the textbox will be drawn to. If you just want to use the default screen, use 0 or FALSE. If you have a particular destination image then use this parameter to specify the image handle.
+The ninth parameter is the font you wish to use in this textbox. If you have a loaded font you want to use, pass the font handle through this parameter. IF you want to use the default font then use TEXTBOX_DEFAULTFONT.
+The tenth parameter is the default font color to use when printing text in the textbox. This parameter should be a 32bit color value. For bright white, the default color, you can pass TEXTBOX_DEFAULTCOLOR. Remember you can convert 4bit colors to 32bit colors using the ctorgb function.
+The eleventh parameter is the background color of the textbox. This parameter should be a 32bit color value. For full transparent, you can pass TEXTBOX_NOBACKGROUND. Remember you can convert 4bit colors to 32bit colors using the ctorgb function.
+The twelveth parameter is the frame color of the textbox. Note that this will also inherently be the color of the scrollbar if you choose to have one. This parameter should be a 32bit color value. For full transparent, you can pass TEXTBOX_NOBACKGROUND. Remember you can convert 4bit colors to 32bit colors using the ctorgb function.
+The thirteenth parameter is the scrollbar parameter. This defines what type of scrollbar your textbox will have. There are 7 possible values for this parameter: TEXTBOX_SCROLLBAR_OFF, TEXTBOX_SCROLLBAR_BOX_DEFAULT, TEXTBOX_SCROLLBAR_BOX_HOLLOW, TEXTBOX_SCROLLBAR_BOX_HOLLOW_NOLINE, TEXTBOX_SCROLLBAR_BALL_DEFAULT, TEXTBOX_SCROLLBAR_BALL_HOLLOW, and TEXTBOX_SCROLLBAR_DOT. These each specify a specific scrollbar theme, test them out to see how they look.
+The fourteenth parameter is the link parameter. This parameter has two possible values: TEXTBOX_LINK_ON, and TEXTBOX_LINK_OFF. TEXTBOX_LINK_ON will allow links to be created and monitored in the textbox and TEXTBOX_LINK_OFF will disallow links and will cause the textbox to ignore any that are created.
+
+The INTEGER retruned by the NEWTEXTBOX function is the handle to the textbox you just created.
+
+Ok so lets try creating a simple textbox:
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|a = NEWTEXTBOX(50, 50, 590, 430, TEXTBOX_SHOW, TEXTBOX_TEXT_STATIC, _         |
+|  TEXTBOX_INPUT_ANY, 0, TEXTBOX_DEFAULTFONT, TEXTBOX_DEFAULTCOLOR, _          |
+|  TEXTBOX_NOBACKGROUND, TEXTBOX_DEFAULTCOLOR, TEXTBOX_SCROLLBAR_ON, _         |
+|  TEXTBOX_LINK_ON)                                                            |
++------------------------------------------------------------------------------+
+
+
+We can call UPDATETEXTBOX to update the textbox's response to user input and to change the text that the textbox is displaying. This should be called every loop or before each call to PRINTTEXTBOX.
+PRINTTEXTBOX prints the textbox to the screen or its destination image. Without calling this there won't be anything on the screen.
+Remember to always free your textboxes when you are done with them. You can free a textbox using TEXTBOXFREE.
+
+Lets update our code to add these new commands:
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|a = NEWTEXTBOX(50, 50, 590, 430, TEXTBOX_SHOW, TEXTBOX_TEXT_STATIC, _         |
+|  TEXTBOX_INPUT_ANY, 0, TEXTBOX_DEFAULTFONT, TEXTBOX_DEFAULTCOLOR, _          |
+|  TEXTBOX_NOBACKGROUND, TEXTBOX_DEFAULTCOLOR, TEXTBOX_SCROLLBAR_ON, _         |
+|  TEXTBOX_LINK_ON)                                                            |
+|UPDATETEXTBOX a                                                               |
+|PRINTTEXTBOX a                                                                |
+|TEXTBOXFREE a                                                                 |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+Well there is our textbox! Not very interesting yet though because it's empty. We will learn to add text in the next section, but lets go over a few additional commands quickly.
+
+You can use the SHOWTEXTBOX and HIDETEXTBOX subroutines to hide or show a textbox. You can get the current status of a textbox using TEXTBOXSTATUS. This will return either TEXTBOX_SHOW or TEXTBOX_HIDE.
+
+You can use TEXTBOXBRINGTOFRONT, TEXTBOXSENDTOBACK, and TEXTBOXSETQUEUE to change the printing queue of a textbox. You can get the current queue value of a textbox using TEXTBOXQUEUE. These are essentially the same as the button queue commands. For more explanation on these commands, see button_documentation: https://db.tt/p9wlgztu.
+
+You can use VALIDTEXTBOX to determine if a textbox handle is valid or not. This function will return TRUE if a textbox handle is valid or FALSE if it is not. You will not need to call this function manually though; all textbox functions and subroutines automatically check that passed textbox handles are valid.
+
+
+
+
+
+                               ---ADDING TEXT---
+
+Now we are going to add some text to the textbox we created.
+
+There are two ways to add text into your textbox. You can add it by line, or you can have it tick character by character. Note that formatting and line breaks are done automatically. The command that we use to add text is TEXTBOXADDTEXT. This has 3 parameters, the textbox handle to add the text to, the text string to add, and the tick speed.
+The you want to have the text tick, you should pass a value as the third parameter respresenting how many ticks you want per second. For example, if you want it to print out at 10 ticks per second, pass the value 10, not 1/10. If you do not want the text to be ticked in but rather just added all at once, pass TEXTBOX_NOTICK.
+Note that if a line is in the process of being ticked in, if you call a new TEXTBOXADDTEXT, the old line will be automatically finished regardless of the tick speed before the new line is begun.
+
+In the example below, everytime you push "z", you will add the text: "Hello world!". By pressing "x" you can see it tick the same text. If you use make enough lines you can also see the scrollbar in action.
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|a = NEWTEXTBOX(50, 50, 590, 430, TEXTBOX_SHOW, TEXTBOX_TEXT_STATIC, _         |
+|  TEXTBOX_INPUT_ANY, 0, TEXTBOX_DEFAULTFONT, TEXTBOX_DEFAULTCOLOR, _          |
+|  TEXTBOX_NOBACKGROUND, TEXTBOX_DEFAULTCOLOR, TEXTBOX_SCROLLBAR_ON, _         |
+|  TEXTBOX_LINK_ON)                                                            |
+|DO                                                                            |
+|    _LIMIT 16                                                                 |
+|    CLS                                                                       |
+|    GETINPUT                                                                  |
+|    UPDATETEXTBOX a                                                           |
+|    PRINTTEXTBOX a                                                            |
+|    IF K = "z" THEN TEXTBOXADDTEXT a, "Hello world!", TEXTBOX_NOTICK          |
+|    IF K = "x" THEN TEXTBOXADDTEXT a, "Hello world!", 10                      |
+|    _DISPLAY                                                                  |
+|LOOP UNTIL ESC                                                                |
+|TEXTBOXFREE a                                                                 |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+If you plan on using the tick option in your code, make sure you call GETINPUT in the loop BEFORE you call UPDATETEXTBOX. I am not sure why it has to be in that order but it does. Remember that we have to call GETINPUT from Gorlock's QB64 Input Library in order to use the input commands.
+So now that you know how to add text to your textbox, try using your own text. Maybe have it read a text file. You can also play around with the different options from NEWTEXTBOX. Also remember that you do not have to wait for the user to add text to the textbox, you could load and add all the text at the beginning of the program and the user would just be able to scroll through it.
+
+If you have enough text to where you can scroll, there are a number of ways to change the lines you are looking at. You can use the scroll wheel on the mouse. If you want it to scroll faster, you can change the value of the ScrollMultiplier variable defined in Gorlock's QB64 Input Library. You can enter a value between -128 and 127, the default value is 1. You can also use the up and down arrow keys to move up and down the lines. You can use the Home key to go to the top line and the End key to go to the end line. Use the Page Up key to move up one textbox height, and the Page Down key to move down one textbox height.
+
+The following subroutines are called automatically as needed so you do not need to worry about manually calling them.
+
+TEXTBOXFORMATTEXT organizes a text string into lines in the textbox after you send it to TEXTBOXADDTEXT.
+TEXTBOXTICK is called with a timer to create the ticking action.
+TEXTBOXREFORMATTEXT removes the text from a textbox and then reenters it through TEXTBOXREFORMATTEXT. This is used to account for any change in size to the textbox or to a change in some other factor.
+TEXTBOXREFORMAT removes and reenters everything from a textbox including images and sub-textboxes. This is used to account for any change in size to the textbox or to a change in some other factor.
+TEXTBOXBACKGROUND creates a background image for a textbox. This is automatically called during the NEWTEXTBOX call and whenenever the background of a textbox changes.
+
+If you need to handle these calls manually for some reason, you will have to look over the code to understand it. If you are calling TEXTBOXTICK manually make sure you turn off the timer that would automatically call it.
+
+If for some reason you want to clear the text and start fresh, you can use the subroutine TEXTBOXCLEARTEXT; this will remove all of the text from a textbox. You could also use the subroutine TEXTBOXCLEAR to remove everything from a textbox including images and sub-textboxes. Bothe of these subroutines only take the textbox handle as a parameter.
+
+
+Before we move on to the next section, lets try one more example. This example will load this documentation into a textbox so make sure this text document is in the program folder.
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|DIM t AS STRING                                                               |
+|SCRX = 800                                                                    |
+|SCRY = 600                                                                    |
+|SCREEN _NEWIMAGE(SCRX, SCRY, SCRZ)                                            |
+|a = NEWTEXTBOX(60, 50, 740, 550, TEXTBOX_SHOW, TEXTBOX_TEXT_STATIC, _         |
+|  TEXTBOX_INPUT_ANY, 0, TEXTBOX_DEFAULTFONT, TEXTBOX_DEFAULTCOLOR, _          |
+|  TEXTBOX_NOBACKGROUND, TEXTBOX_DEFAULTCOLOR, TEXTBOX_SCROLLBAR_ON, _         |
+|  TEXTBOX_LINK_ON)                                                            |
+|OPEN "textbox_documentation.txt" FOR INPUT AS #1                              |
+|DO                                                                            |
+|    LINE INPUT #1, t                                                          |
+|    TEXTBOXADDTEXT a, t, TEXTBOX_NOTICK                                       |
+|LOOP UNTIL EOF(1)                                                             |
+|CLOSE #1                                                                      |
+|DO                                                                            |
+|    _LIMIT 16                                                                 |
+|    CLS                                                                       |
+|    GETINPUT                                                                  |
+|    UPDATETEXTBOX a                                                           |
+|    PRINTTEXTBOX a                                                            |
+|    _DISPLAY                                                                  |
+|LOOP UNTIL ESC                                                                |
+|TEXTBOXFREE a                                                                 |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+
+
+
+                             ---COLORS AND LINKS---
+
+In the last section, we learned how to add text, but lets be honest, it was pretty boring. We can change the color of the font, but it is always all the same color. In this section we will learn to spice up our text.
+
+In order to create text effects, I created the Textbox Mark-Up Language (TBML). This is similar to HTML in its implementation but it only has a few commands as of now. Below, the available commands are listed:
+
+<#b>      - create bookmark
+<#c></#c> - change color
+<#l></#l> - create link
+<#m>      - center line
+
+You can add these elements into your text string before you send it to TEXTBOXADDTEXT and it will create an effect on the text rather than being displayed.
+
+To change the color of a certain length of text, you use the 'c' element. The syntax is <#c[n]></#c> where n is the color value you want the text to be. This color will only be applied to the text between the start and end blocks. If you do not specify an end block then it will be assumed at the end of the line. Try sending the following string through TEXTBOXADDTEXT:
+
+"Hello <#c10>world</#c>!"
+
+The possible values for the color value are either a number value or a non-case-specific color code. The possible values are as follows:
+
+ 0   BLACK
+ 1   DARK BLUE      DARKBLUE      DARK_BLUE
+ 2   DARK LIME      DARKLIME      DARK_LIME
+ 3   DARK CYAN      DARKCYAN      DARK_CYAN
+ 4   RED
+ 5   DARK MAGENTA   DARKMAGENTA   DARK_MAGENTA
+ 6   GOLDEN ROD     GOLDENROD     GOLDEN_ROD
+ 7   LIGHT GRAY     LIGHTGRAY     LIGHT_GRAY
+ 8   GRAY
+ 9   BLUE
+10   GREEN
+11   CYAN
+12   ORANGE
+13   MAGENTA
+14   YELLOW
+15   WHITE
+
+If you enter an unknown color code, it will default to BLACK.
+If you enter a color value greater than 15 then it is assumed to be a 32bit color value. If you really need a 32bit color value between 0 and 15 then you will have to find some work-around.
+
+You can also use nested colors:
+
+"Hello <#c10>w<#c14>o</#c>rld</#c>!"
+
+
+Now that we have learned about colors, lets learn about centering text. To center a line in the middle of the textbox, use the 'm' element. This should be placed at the beginning of the line but it could really be placed anywhere. If the length of text in the line exceeds the width of the textbox the command will be ignored. This is a faster way to make titles centered rather than using a new textbox with the TEXTBOX_TITLE status or counting the number of spaces you need. This can be particularly useful for a textbox with varying dimensions.
+
+"<#m>Hello world!"
+
+Note that this element does not have an end block. That is because the element affects the entire line.
+
+
+Links provide you with a way to make your textboxes interactive. To create links, use the 'l' element.
+The syntax is similar to the 'c' element: <#ln></#l> where n is the link identifier. You can use any value that you want for the link identifier; it does not necessarily be in order or starting from 1. Just make sure that you use unique identifiers so that you can check its status. You could also give multiple links the same identifier if you want them to perform the same action.
+When you choose a link identifier remember that the textbox will check for bookmarks with the same identifier before making the link available to check as a button. More on this later.
+
+Do not make an entire line a link, choose specific words or phrases. Also, currently the link does not work properly if you start it at the beginning of the line or end it at the end of the line. I will fix this problem in the future, but for now just stick to links inside text lines. I would not recommend using nested links because it can become confusing, but there is nothing stopping you.
+
+So after we create a link, we can monitor it with LINKSTATUS. This function takes two parameters: the textbox handle and the link identifier. The function will return one of the link status constants; either TEXTBOX_LINKSTATUS_STAND, TEXTBOX_LINKSTATUS_HOVER, or TEXTBOX_LINKSTATUS_ACTIVE. When the link has been clicked the value will be TEXTBOX_LINKSTATUS_ACTIVE. Note that after you call LINKSTATUS, the status will be reset to TEXTBOX_LINKSTATUS_STAND, so if you need to use the value of the status more than once per loop, store it to a variable.
+
+Lets try an example:
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|a = NEWTEXTBOX(50, 50, 590, 430, TEXTBOX_SHOW, TEXTBOX_TEXT_STATIC, _         |
+|  TEXTBOX_INPUT_ANY, 0, TEXTBOX_DEFAULTFONT, TEXTBOX_DEFAULTCOLOR, _          |
+|  TEXTBOX_NOBACKGROUND, TEXTBOX_DEFAULTCOLOR, TEXTBOX_SCROLLBAR_ON, _         |
+|  TEXTBOX_LINK_ON)                                                            |
+|TEXTBOXADDTEXT a, "Hello <#l20>world</#l>!", TEXTBOX_NOTICK                   |
+|DO                                                                            |
+|    _LIMIT 16                                                                 |
+|    CLS                                                                       |
+|    GETINPUT                                                                  |
+|    UPDATETEXTBOX a                                                           |
+|    PRINTTEXTBOX a                                                            |
+|    IF LINKSTATUS(a, 20) = TEXTBOX_LINKSTATUS_ACTIVE THEN                     |
+|        CLS                                                                   |
+|        PRINT "hit"                                                           |
+|        _DISPLAY                                                              |
+|        END                                                                   |
+|    END IF                                                                    |
+|    _DISPLAY                                                                  |
+|LOOP UNTIL ESC                                                                |
+|TEXTBOXFREE a                                                                 |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+When we click the link with an identifier of 20, the action is performed.
+
+Links will only appear and work if you have the link status turned to TEXTBOX_LINK_ON. This is the last parameter when using NEWTEXTBOX, but we can also use commands to change the status of the links.
+Call LINKHIDE to set the link status to TEXTBOX_LINK_OFF, or LINKSHOW to set it to TEXTBOX_LINK_ON.
+Note that the default color for a link is GREEN for TEXTBOX_LINKSTATUS_STAND, BLUE for TEXTBOX_LINKSTATUS_HOVER, and MAGENTA for TEXTBOX_LINKSTATUS_ACTIVE. You will learn how to customize the link colors in the next section.
+
+
+The last element you can use is 'b'. This is for setting bookmarks. The syntax for this element is <#bn> where n is the bookmark identifier. This should be placed at the beginning of the line but it could really be placed anywhere. By placing a bookmark, you are essentially tagging a line in your textbox. You can then creat links to go directly to that line. If a link identifier matches a bookmark identifier then they are linked and by clicking the link you will moved to the line with the bookmark. If a link is associated with a bookmark, even if you check LINKSTATUS, you can't use the link manually.
+
+"<#b1>Hello world!"
+
+Note that this element does not have an end block. That is because the element affects the entire line.
+
+
+
+
+
+                         ---CUSTOMIZING YOUR TEXTBOX---
+
+There are also several ways to customize your textbox.
+
+We set there to be a scrollbar or not when we called NEWTEXTBOX, but we can alter it afterwards too.
+You can call SCROLLBARHIDE to hide the scrollbar or SCROLLBARSHOW to show the scrollbar. When you call either of these, the textbox will be reformatted, with all data being preserved, because the scrollbar takes up 2 character columns that can be used for characters if the scrollbar is hidden.
+
+You also don't have to keep the scrollbar as the theme you chose or default color. To change these properties of the scrollbar, we use SCROLLBARSET. This subroutine has 5 parameters:
+
+The first parameter is the handle of the textbox.
+The second parameter is the scrollbar color. By default, the scrollbar is the same color as the frame. This parameter will only accept a 32bit color value. If you want to keep the same color value that it was before, you can pass TEXTBOX_KEEPCOLOR. If you want to set the color value to the default color value you can pass FALSE or 0.
+The third parameter is the scrollbar theme. There are 7 possible values for this parameter: TEXTBOX_SCROLLBAR_OFF, TEXTBOX_SCROLLBAR_BOX_DEFAULT, TEXTBOX_SCROLLBAR_BOX_HOLLOW, TEXTBOX_SCROLLBAR_BOX_HOLLOW_NOLINE, TEXTBOX_SCROLLBAR_BALL_DEFAULT, TEXTBOX_SCROLLBAR_BALL_HOLLOW, and TEXTBOX_SCROLLBAR_DOT. Test them out to see how they look.
+The fourth parameter is whether the scrollbar will have a vertical line or not. This parameter can be set to either TEXTBOX_SCROLLBAR_LINE for a line, or TEXTBOX_SCROLLBAR_NOLINE for no line. By default there is no line. If you choose to have a line it will be the same color as the scrollbar, not the frame. This is useful if you choose not to have a scrollbar box, so the scrollbar isn't just floating.
+The fifth parameter is whether the scrollbar will have a box or not. This parameter can be set to either TEXTBOX_SCROLLBAR_BOX for a box, or TEXTBOX_SCROLLBAR_NOBOX for no box. By default there is a box. If you choose to have a box, it will be the same color as the frame.
+
+
+You can change the properties of a textbox's links as well. You may have noticed that when you created links, they all had the default link colors and an underline. You can use the LINKSET subroutine to change these properties. The LINKSET subroutine has 5 parameters:
+
+The first parameter is the handle of the textbox.
+The second parameter is the stand color; the color of the link when the mouse is not over it.  By default, the stand color is TEXTBOX_LINK_STAND. This parameter will only accept a 32bit color value. If you want to keep the same color value that it was before, you can pass TEXTBOX_KEEPCOLOR. If you want to set the color value to the default color value you can pass FALSE or 0.
+The third parameter is the hover color; the color of the link when the mouse is over it.  By default, the hover color is TEXTBOX_LINK_HOVER. This parameter will only accept a 32bit color value. If you want to keep the same color value that it was before, you can pass TEXTBOX_KEEPCOLOR. If you want to set the color value to the default color value you can pass FALSE or 0.
+The fourth parameter is the active color; the color of the link when it is being clicked.  By default, the active color is TEXTBOX_LINK_ACTIVE. This parameter will only accept a 32bit color value. If you want to keep the same color value that it was before, you can pass TEXTBOX_KEEPCOLOR. If you want to set the color value to the default color value you can pass FALSE or 0.
+The fifth parameter is the link underline. This tells the textbox whether to underline links or not. There are two available values for this parameter: TEXTBOX_LINK_UNDERLINE_ON, and TEXTBOX_LINK_UNDERLINE_OFF. TEXTBOX_LINK_UNDERLINE_ON will turn the underline on while TEXTBOX_LINK_UNDERLINE_OFF will turn it off. Note that the color of the underline is the same color of the link at that moment.
+
+
+If you want to add a ticking sound when your text ticks like in old NES games, you can use TEXTBOXSETTICK. This subroutine links an audio handle with the textbox which will be played every time it ticks.
+The TEXTBOXSETTICK subroutine has only two parameters: the handle of the textbox, and the handle of an audio that has been loaded. If you want to change the volume of the sound, or change it in some other way, you can do this outside of the library. The library just plays the audio handle it has stored, if any, after every tick.
+
+Note that this audio file should be very short, especially if you are trying to print with a higher tick per second value. The audio file that is loaded will also need to have SYNC enabled.
+Also note that if you free a textbox with a linked tick sound, the sound will not be freed!
+
+
+You can also create customized backgrounds to your textbox.
+If you want to use a particular image as the background of your textbox rather than just a plain color, you can set an image as your background using the TEXTBOXSETBACKGROUND subroutine. This subroutine has 3 parameters: the textbox handle, the image handle, and the behabior of the image on the background.
+
+There are 3 different possible values for the behaviour parameter:
+   TEXTBOX_BACKGROUND_STRETCH stretches the image to occupy the entire are of the textbox background.
+   TEXTBOX_BACKGROUND_FIT streches the image until either the height or width match the textbox background.
+   TEXTBOX_BACKGROUND_CENTER does not stretch the image and only places it in the middle of the textbox background.
+Each behaviour works well for certain shapes of images and doesn't work so well for others so just play around with it.
+
+
+
+
+
+                           ---CONTROLLING YOUR TEXTBOX---
+
+You can also control and manipulate your textbox in a number of ways.
+
+You can create a bound for your textbox, this is another area that your textbox is allowed to be in. You can do this by using the subroutine TEXTBOXBOUND. This is different from the textbox's area because the area determines where the textbox is and the boundary determines where it can be. Imagine you placed your textbox's area from (50, -50) to (500, 450). You would only be able to see part of the textbox because some of it is off the screen, in terms of boundaries, the boundary would be the screen. You could create another boundary smaller than the screen that would behave the same way in that if a textbox extended beyond the boundary it would not be printed.
+There are 5 parameters in the TEXTBOXBOUND subroutine. The first parameter is the textbox handle. The next four parameters are left, top, right, and bottom. These parameters represent the rectangular area of the boundary you are creating. The parameters stand for the x coordinate of the upper left corner of the boundary, the y coordinate of the upper left corner of the boundary, the x coordinate of the lower right corner of the boundary, and the y coordinate of the lower right corner of the boundary, respectively.
+
+Lets see an example:
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|DIM t AS STRING                                                               |
+|SCRX = 800                                                                    |
+|SCRY = 600                                                                    |
+|SCREEN _NEWIMAGE(SCRX, SCRY, SCRZ)                                            |
+|a = NEWTEXTBOX(60, 50, 740, 550, TEXTBOX_SHOW, TEXTBOX_TEXT_STATIC, _         |
+|  TEXTBOX_INPUT_ANY, 0, TEXTBOX_DEFAULTFONT, TEXTBOX_DEFAULTCOLOR, _          |
+|  TEXTBOX_NOBACKGROUND, TEXTBOX_DEFAULTCOLOR, TEXTBOX_SCROLLBAR_ON, _         |
+|  TEXTBOX_LINK_ON)                                                            |
+|TEXTBOXBOUND a, 90, 50, 740, 550                                              |
+|OPEN "textbox_documentation.txt" FOR INPUT AS #1                              |
+|DO                                                                            |
+|    LINE INPUT #1, t                                                          |
+|    TEXTBOXADDTEXT a, t, TEXTBOX_NOTICK                                       |
+|LOOP UNTIL EOF(1)                                                             |
+|CLOSE #1                                                                      |
+|DO                                                                            |
+|    _LIMIT 16                                                                 |
+|    CLS                                                                       |
+|    GETINPUT                                                                  |
+|    UPDATETEXTBOX a                                                           |
+|    PRINTTEXTBOX a                                                            |
+|    _DISPLAY                                                                  |
+|LOOP UNTIL ESC                                                                |
+|TEXTBOXFREE a                                                                 |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+The textbox works just as normal, except since the area exceeds the bound, everything beyond the bound is not printed.
+This may seem silly, but if you have a moving textbox on a particular area of the screen it is useful to be able to prevent the textbox from printing beyond that particular area.
+
+Once you create a boundary for a textbox, it is defaulted to be on. You can use TEXTBOXBOUNDOFF to temporarily disable the boundary, and TEXTBOXBOUNDON to turn it back on.
+
+
+You can also change the original dimensions of the textbox area you set in NEWTEXTBOX. To do this use the subroutine TEXTBOXRESIZE. This subroutine has 5 parameters. The first parameter is the textbox handle. The next four parameters are left, top, right, and bottom. These parameters represent the new rectangular area of the textbox. The parameters stand for the x coordinate of the upper left corner of the new area, the y coordinate of the upper left corner of the new area, the x coordinate of the lower right corner of the new area, and the y coordinate of the lower right corner of the new area, respectively.
+You don't have to worry about fixing your text and images when you resize; everything is automatically restructured to fit the new area!
+Currently sub-textboxes are lost during a resize, but I hope to fix this in the future.
+
+
+You can create an exact copy of a textbox using CLONETEXTBOX. This will copy the textbox of the handle you pass and return the textbox handle of the cloned textbox. This can be useful if you want to mess with something but want to be able to revert it back to a saved state.
+You can swap the handles of two textboxes using SWAPTEXTBOX. This takes two textbox handles as parameters and leaves the textboxes unedited but swaps their handles. This could be useful for organizing your textboxes.
+
+
+
+
+
+                              ---ADDING IMAGES---
+
+You can also add image to your textboxes; to do this use TEXTBOXADDIMAGE. The TEXTBOXADDIMAGE subroutine has 9 parameters:
+
+The first parameter is the textbox handle.
+The second parameter is the row. This value is relative to the row you are on, in most cases this parameter will be TEXTBOX_NEXTROW. You can try TEXTBOX_NEXTROW + 3 or - 1 or anything else to see where it put the image.
+The third through sixth parameters are left, top, right, and bottom. These parameters represent the rectangular area of the image you are creating. The parameters stand for the x coordinate of the upper left corner of the image, the y coordinate of the upper left corner of the image, the x coordinate of the lower right corner of the image, and the y coordinate of the lower right corner of the image, respectively.
+The seventh parameter is the image handle.
+The eigth parameter is the border of the image. If you want the image to have a border, pass a 32bit color value and it will draw a rectangluar border around the image. If you do not want a border then pass TEXTBOX_IMAGE_NOBORDER.
+The ninth parameter is the behaviour of the image. There are three possible values for this parameter:
+   TEXTBOX_IMAGE_BLOCK takes up the entire row on the textbox.
+   TEXTBOX_IMAGE_SURROUND lets text come up to the edge of the image and then starts again on the other side where there is room.
+   TEXTBOX_IMAGE_WRAP is the same as TEXTBOX_IMAGE_SURROUND except if an image has alpha transparency, where it transparent words can be printed as well.
+
+Remember that images are saved and resized when the textbox is resized and text will be reformatted around it, or not depending on the behaviour you chose.
+
+Here is a sample but you will have to choose an image on your own and name it a.jpg:
+
+
++------------------------------------------------------------------------------+
+|DIM a AS INTEGER                                                              |
+|DIM i AS LONG                                                                 |
+|DIM t AS STRING                                                               |
+|SCRX = 800                                                                    |
+|SCRY = 600                                                                    |
+|SCREEN _NEWIMAGE(SCRX, SCRY, SCRZ)                                            |
+|a = NEWTEXTBOX(60, 50, 740, 550, TEXTBOX_SHOW, TEXTBOX_TEXT_STATIC, _         |
+|  TEXTBOX_INPUT_ANY, 0, TEXTBOX_DEFAULTFONT, TEXTBOX_DEFAULTCOLOR, _          |
+|  TEXTBOX_NOBACKGROUND, TEXTBOX_DEFAULTCOLOR, TEXTBOX_SCROLLBAR_ON, _         |
+|  TEXTBOX_LINK_ON)                                                            |
+|i = _LOADIMAGE("a.jpg")                                                       |
+|OPEN "textbox_documentation.txt" FOR INPUT AS #1                              |
+|DO                                                                            |
+|    LINE INPUT #1, t                                                          |
+|    IF t = STRING$(80, "=") OR t = STRING$(80, "-") THEN                      |
+|        TEXTBOXADDIMAGE a, TEXTBOX_IMAGE_NEXTROW, 0, 0, 0, 0, i, _            |
+|          TEXTBOX_IMAGE_NOBORDER, TEXTBOX_IMAGE_BLOCK                         |
+|    ELSE                                                                      |
+|        TEXTBOXADDTEXT a, t, TEXTBOX_NOTICK                                   |
+|    END IF                                                                    |
+|LOOP UNTIL EOF(1)                                                             |
+|CLOSE #1                                                                      |
+|DO                                                                            |
+|    _LIMIT 16                                                                 |
+|    CLS                                                                       |
+|    GETINPUT                                                                  |
+|    UPDATETEXTBOX a                                                           |
+|    PRINTTEXTBOX a                                                            |
+|    _DISPLAY                                                                  |
+|LOOP UNTIL ESC                                                                |
+|TEXTBOXFREE a                                                                 |
+|END                                                                           |
++------------------------------------------------------------------------------+
+
+
+The area you put it to will not always be acceptable so it will adjust it as necessary. If you send (0, 0)-(0, 0), it will try to center it.
+If you use a top& value, it will be in pixels below the bottom of the row defined in the row parameter.
+
+
+
+
+
+                             ---NEXTED TEXTBOXES---
+
+You can now add textboxes to your textboxes! These are called sub-textboxes. This can be achieved with the TEXTBOXADDTEXTBOX function. This function has 12 parameter:
+
+The first parameter is the textbox handle you want to put a sub-textbox in.
+The second parameter is the row. This value is relative to the row you are on, in most cases this parameter will be TEXTBOX_NEXTROW. You can try TEXTBOX_NEXTROW + 3 or - 1 or anything else to see where it put the textbox.
+The third through sixth parameters are left, top, right, and bottom. These parameters represent the rectangular area of the textbox you are creating. The parameters stand for the x coordinate of the upper left corner of the textbox, the y coordinate of the upper left corner of the textbox, the x coordinate of the lower right corner of the textbox, and the y coordinate of the lower right corner of the textbox, respectively.
+The seventh parameter is the box type. This value dictates how the textbox will behave when text is added. This uses the same 5 values as the sixth parameter of NEWTEXTBOX.
+The eigth parameter is the font color. You can't change the font of a sub-textbox, but you can change the default color, this can lead to cool effects. This value will accept a 32bit color value or TEXTBOX_DEFAULTCOLOR for white.
+The ninth parameter is the background color. This is the color of the background image of the sub-textbox. This can be a 32bit color value or TEXTBOX_NOBACKGROUND for a transparent background.
+The tenth parameter is the frame color. This can be any 32bit color value or TEXTBOX_DEFAULTCOLOR for white.
+The eleventh parameter is the scrollbar status. This parameter uses the same values as the thirteenth parameter of NEWTEXTBOX and determines the theme of the scrollbar of the sub-textbox.
+The twelfth parameter is the link status. This can either be TEXTBOX_LINK_ON to allow links, or TEXTBOX_LINK_OFF to prevent links from being displayed and monitored.
+
+The value returned is the handle of the sub-textbox created. This handle allows you to monitor this textbox and add text, images, and sub-textboxes to it.
+
+The placing of textboxes is pretty much the same as the placing of images.
+
+Remember, sub-textboxes are lost if you try to resize a textbox with sub-textboxes. In the future I hope to fix this and add more support for sub-textboxes.
+
+
+--------------------------------------------------------------------------------
+
+
+I hope you enjoy this library! If you discover an error, think of an idea for a future update, or have a question about the library, please email me at ZGorlock@gmail.com.
+
+
+================================================================================
